@@ -4,3 +4,4 @@ package-lock.json
 .npmrc
 node_modules/
 dist/
+.env
