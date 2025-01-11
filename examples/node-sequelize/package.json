@@ -9,6 +9,7 @@
     "migrate:reset": "sequelize-cli db:migrate:undo:all && sequelize-cli db:migrate"
   },
   "dependencies": {
+    "@timescaledb/schemas": "workspace:^",
     "express": "^4.18.2",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",

@@ -8,8 +8,3 @@ export interface PageViewStats {
   count: number;
   unique_users: number;
 }
-
-export interface CompressionStats {
-  total_chunks: number;
-  compressed_chunks: number;
-}
