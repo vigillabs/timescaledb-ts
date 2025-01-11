@@ -4,6 +4,7 @@ import sequelize from '../src/database';
 import PageLoad from '../src/models/PageLoad';
 import { faker } from '@faker-js/faker';
 import { QueryTypes } from 'sequelize';
+import { CompressionStats } from '@timescaledb/schemas';
 
 describe('GET /api/compression', () => {
   beforeEach(async () => {
@@ -47,7 +48,7 @@ describe('GET /api/compression', () => {
           type: QueryTypes.SELECT,
         },
       )
-    )[0] as unknown as { total_chunks: number; number_compressed_chunks: number };
+    )[0] as unknown as CompressionStats;
 
     expect(response.body).toEqual(
       expect.objectContaining({
