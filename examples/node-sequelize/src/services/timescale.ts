@@ -1,7 +1,7 @@
 import sequelize from '../database';
-import { TimeRange, PageViewStats } from '../types';
+import { PageViewStats } from '../types';
 import { QueryTypes } from 'sequelize';
-import { CompressionStats } from '@timescaledb/schemas';
+import { CompressionStats, TimeRange } from '@timescaledb/schemas';
 
 export async function getPageViewStats(range: TimeRange): Promise<PageViewStats[]> {
   const stats = await sequelize.query(
