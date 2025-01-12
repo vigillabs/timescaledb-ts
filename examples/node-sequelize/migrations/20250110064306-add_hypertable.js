@@ -1,33 +1,32 @@
 'use strict';
 
+const { TimescaleDB } = require('@timescaledb/core');
+
+const hypertable = TimescaleDB.createHypertable('page_loads', {
+  by_range: {
+    columnName: 'time',
+  },
+  compression: {
+    compress: true,
+    compress_orderby: 'time',
+    compress_segmentby: 'user_agent',
+    policy: {
+      schedule_interval: '7 days',
+    },
+  },
+});
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    try {
-      await queryInterface.sequelize.query("SELECT create_hypertable('page_loads', 'time');");
+    const sql = hypertable.up().build();
 
-      await queryInterface.sequelize.query('ALTER TABLE page_loads SET (timescaledb.compress);');
-      await queryInterface.sequelize.query(
-        "ALTER TABLE page_loads SET (timescaledb.compress_segmentby = 'user_agent', timescaledb.compress_orderby = 'time');",
-      );
-
-      await queryInterface.sequelize.query("SELECT add_compression_policy('page_loads', INTERVAL '7 days');");
-    } catch (error) {
-      console.error('TimescaleDB operation failed:', error);
-      throw error;
-    }
+    await queryInterface.sequelize.query(sql);
   },
 
   async down(queryInterface) {
-    try {
-      await queryInterface.sequelize.query("SELECT remove_compression_policy('page_loads');");
+    const sql = hypertable.down().build();
 
-      await queryInterface.sequelize.query('ALTER TABLE page_loads SET (timescaledb.compress = false);');
-
-      await queryInterface.sequelize.query("SELECT drop_chunks('page_loads', NOW());");
-    } catch (error) {
-      console.error('Failed to remove TimescaleDB features:', error);
-      throw error;
-    }
+    await queryInterface.sequelize.query(sql);
   },
 };

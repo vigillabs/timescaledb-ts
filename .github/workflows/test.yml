@@ -58,7 +58,10 @@ jobs:
           DATABASE_URL: postgres://postgres:password@localhost:5432/sequelize
         run: pnpm run --filter @timescaledb/example-node-sequelize migrate
 
-      - name: Run Tests
+      - name: Run Core Tests
+        run: pnpm run --filter @timescaledb/core test
+
+      - name: Run Core Tests
         env:
           DATABASE_URL: postgres://postgres:password@localhost:5432/sequelize
         run: pnpm run --filter @timescaledb/example-node-sequelize test

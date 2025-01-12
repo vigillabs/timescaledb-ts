@@ -9,6 +9,7 @@ Once you have cloned the repo, you can use `pnpm <command>` to manage the monore
 
 - `pnpm install` - Install all dependencies
 - `pnpm build` - Build all packages
+- `pnpm test` - Test all packages
 - `pnpm lint` - Lint all packages
 - `pnpm format` - Format all packages
 - `pnpm clean` - Factory reset the monorepo(debugging purposes)

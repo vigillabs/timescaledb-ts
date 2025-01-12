@@ -105,6 +105,9 @@ importers:
 
   examples/node-sequelize:
     dependencies:
+      '@timescaledb/core':
+        specifier: workspace:^
+        version: link:../../packages/core
       '@timescaledb/schemas':
         specifier: workspace:^
         version: link:../../packages/schemas
@@ -134,7 +137,11 @@ importers:
         specifier: ^6.6.2
         version: 6.6.2
 
-  packages/core: {}
+  packages/core:
+    dependencies:
+      '@timescaledb/schemas':
+        specifier: workspace:^
+        version: link:../schemas
 
   packages/schemas:
     dependencies:

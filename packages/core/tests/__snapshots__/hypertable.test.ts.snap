@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Hypertable down should drop a hypertable 1`] = `"SELECT drop_chunks('my_table', NOW());"`;
+
+exports[`Hypertable down should drop a hypertable with compression 1`] = `
+"ALTER TABLE my_table SET (timescaledb.compress = false);
+SELECT drop_chunks('my_table', NOW());"
+`;
+
+exports[`Hypertable down should drop a hypertable with compression policy 1`] = `
+"ALTER TABLE my_table SET (timescaledb.compress = false);
+SELECT remove_compression_policy('my_table');
+SELECT drop_chunks('my_table', NOW());"
+`;
+
+exports[`Hypertable up should create and build a hypertable 1`] = `"SELECT create_hypertable('my_table', by_range('time'));"`;
+
+exports[`Hypertable up should create and build a hypertable with compression 1`] = `
+"SELECT create_hypertable('my_table', by_range('time'));
+ALTER TABLE my_table SET (
+        timescaledb.compress, 
+        timescaledb.compress_orderby = 'time', 
+        timescaledb.compress_segmentby = 'user_agent' 
+      );"
+`;
+
+exports[`Hypertable up should create and build a hypertable with compression policy 1`] = `
+"SELECT create_hypertable('my_table', by_range('time'));
+ALTER TABLE my_table SET (
+        timescaledb.compress, 
+        timescaledb.compress_orderby = 'time', 
+        timescaledb.compress_segmentby = 'user_agent' 
+      );
+SELECT add_compression_policy('my_table', INTERVAL '1d');"
+`;
