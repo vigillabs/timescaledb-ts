@@ -4,7 +4,7 @@ const { TimescaleDB } = require('@timescaledb/core');
 
 const hypertable = TimescaleDB.createHypertable('page_loads', {
   by_range: {
-    columnName: 'time',
+    column_name: 'time',
   },
   compression: {
     compress: true,
