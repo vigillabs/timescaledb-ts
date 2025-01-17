@@ -8,6 +8,7 @@ If you are looking to setup this project locally, you can follow the instruction
 
 - [@timescaledb/core](./packages/core/README.md)
 - [@timescaledb/schemas](./packages/schemas/README.md)
+- [@timescaledb/utils](./packages/utils/README.md)
 
 ## Examples
 
