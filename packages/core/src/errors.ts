@@ -3,3 +3,7 @@ export enum HypertableErrors {
   OPTIONS_REQUIRED = 'Hypertable options are required',
   INVALID_OPTIONS = 'Invalid hypertable options',
 }
+
+export enum ExtensionErrors {
+  INVALID_OPTIONS = 'Invalid extension options',
+}

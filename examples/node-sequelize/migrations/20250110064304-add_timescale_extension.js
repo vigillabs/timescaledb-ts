@@ -1,12 +1,20 @@
 'use strict';
 
+const { TimescaleDB } = require('@timescaledb/core');
+
+const extension = TimescaleDB.createExtension();
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    await queryInterface.sequelize.query('CREATE EXTENSION IF NOT EXISTS timescaledb;');
+    const sql = extension.up().build();
+
+    await queryInterface.sequelize.query(sql);
   },
 
   async down(queryInterface) {
-    await queryInterface.sequelize.query('DROP EXTENSION IF EXISTS timescaledb;');
+    const sql = extension.down().build();
+
+    await queryInterface.sequelize.query(sql);
   },
 };

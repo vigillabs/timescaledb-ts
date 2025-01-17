@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Extension down should drop an extension 1`] = `"DROP EXTENSION IF EXISTS timescaledb;"`;
+
+exports[`Extension down should drop an extension with cascade 1`] = `"DROP EXTENSION IF EXISTS timescaledb CASCADE;"`;
+
+exports[`Extension up should create an extension 1`] = `"CREATE EXTENSION IF NOT EXISTS timescaledb;"`;
+
+exports[`Extension up should create an extension with cascade 1`] = `"CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE;"`;
