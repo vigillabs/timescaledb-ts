@@ -14,9 +14,11 @@
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./dist",
+    "baseUrl": ".",
     "paths": {
-      "@timescaledb/*": ["../*/src"]
+      "@timescaledb/schemas": ["../schemas/dist"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
