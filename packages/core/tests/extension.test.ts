@@ -5,7 +5,7 @@ describe('Extension', () => {
   it('should fail when creating an extension without invalid options', () => {
     expect(() => {
       TimescaleDB.createExtension({
-        // @ts-expect-error
+        // @ts-ignore
         invalidOption: 'invalid',
       });
     }).toThrow(ExtensionErrors.INVALID_OPTIONS);
