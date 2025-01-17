@@ -14,7 +14,10 @@
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./dist",
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "paths": {
+      "@timescaledb/*": ["../../packages/*/src"]
+    }
   },
   "include": ["src", "config", "migrations"]
 }

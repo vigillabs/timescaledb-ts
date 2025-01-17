@@ -14,7 +14,10 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "paths": {
+      "@timescaledb/*": ["../*/src"]
+    }
   },
   "include": ["src"]
 }
