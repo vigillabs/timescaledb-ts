@@ -8,7 +8,7 @@ const router = Router();
 router.post('/pageview', async (req, res) => {
   try {
     const userAgent = req.get('user-agent') || 'unknown';
-    const time = new Date(); // Don't modify the timestamp
+    const time = new Date();
 
     const pageLoadRepository = AppDataSource.getRepository(PageLoad);
     await pageLoadRepository.save({ userAgent, time });
