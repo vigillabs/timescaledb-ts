@@ -1,6 +1,6 @@
 # Node Sequelize Example
 
-Example of using TimescaleDB with Node.js and Sequelize. Based on the legacy [Node.js Quick Start](https://docs.timescale.com/quick-start/latest/node/) but updated with TypeScript and better practices + tests.
+Example of using TimescaleDB with Node.js and [Sequelize](https://sequelize.org/). Based on the legacy [Node.js Quick Start](https://docs.timescale.com/quick-start/latest/node/) but updated with TypeScript and better practices + tests.
 
 ## What it does
 
