@@ -9,7 +9,7 @@ class HypertableUpBuilder {
 
   constructor(name: string, options: CreateHypertableOptions) {
     this.name = name;
-    this.options = CreateHypertableOptionsSchema.parse(options);
+    this.options = options;
   }
 
   public build(): string {
@@ -48,7 +48,7 @@ class HypertableDownBuilder {
 
   constructor(name: string, options: CreateHypertableOptions) {
     this.name = name;
-    this.options = CreateHypertableOptionsSchema.parse(options);
+    this.options = options;
   }
 
   public build(): string {
