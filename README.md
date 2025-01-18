@@ -8,7 +8,7 @@ If you are looking to setup this project locally, you can follow the instruction
 
 - [@timescaledb/core](./packages/core/README.md) - Migration and query helpers
 - [@timescaledb/schemas](./packages/schemas/README.md) - TimescaleDB object schemas
-- [@timescaledb/utils](./packages/utils/README.md) - utilities and helpers - EG: SQL escape
+- [@timescaledb/utils](./packages/utils/README.md) - utilities and helpers
 
 ## Examples
 
