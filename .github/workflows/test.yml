@@ -49,19 +49,30 @@ jobs:
             sleep 1
           done
 
-      - name: Create Database
+      - name: Create Databases
         run: |
           PGPASSWORD=password psql -h localhost -U postgres -c 'CREATE DATABASE sequelize;' postgres
+          PGPASSWORD=password psql -h localhost -U postgres -c 'CREATE DATABASE typeorm;' postgres
+
+      - name: Run Core Package Tests
+        run: pnpm run --filter @timescaledb/core test
 
       - name: Run Sequelize Migration
         env:
           DATABASE_URL: postgres://postgres:password@localhost:5432/sequelize
         run: pnpm run --filter @timescaledb/example-node-sequelize migrate
 
-      - name: Run Core Tests
-        run: pnpm run --filter @timescaledb/core test
+      - name: Run TypeORM Migration
+        env:
+          DATABASE_URL: postgres://postgres:password@localhost:5432/typeorm
+        run: pnpm run --filter @timescaledb/example-node-typeorm migrate
 
-      - name: Run Core Tests
+      - name: Run Sequelize Tests
         env:
           DATABASE_URL: postgres://postgres:password@localhost:5432/sequelize
         run: pnpm run --filter @timescaledb/example-node-sequelize test
+
+      - name: Run TypeORM Tests
+        env:
+          DATABASE_URL: postgres://postgres:password@localhost:5432/typeorm
+        run: pnpm run --filter @timescaledb/example-node-typeorm test
