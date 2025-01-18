@@ -1,13 +1,12 @@
-# Node Sequelize Example
+# Node TypeORM Example
 
-Example of using TimescaleDB with Node.js and [Sequelize](https://sequelize.org/). Based on the legacy [Node.js Quick Start](https://docs.timescale.com/quick-start/latest/node/) but updated with TypeScript and better practices + tests.
+Example of using TimescaleDB with Node.js and [TypeORM](https://typeorm.io/).
 
 ## What it does
 
 - Tracks page views with user agent data
 - Uses hypertables for time-series data
 - Handles data compression automatically
-- Provides stats endpoints with time bucketing
 
 ## Quick Start
 

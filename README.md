@@ -6,10 +6,11 @@ If you are looking to setup this project locally, you can follow the instruction
 
 ## Packages
 
-- [@timescaledb/core](./packages/core/README.md)
-- [@timescaledb/schemas](./packages/schemas/README.md)
-- [@timescaledb/utils](./packages/utils/README.md)
+- [@timescaledb/core](./packages/core/README.md) - Migration and query helpers
+- [@timescaledb/schemas](./packages/schemas/README.md) - TimescaleDB object schemas
+- [@timescaledb/utils](./packages/utils/README.md) - utilities and helpers
 
 ## Examples
 
-- [Node Sequelize Example](./examples/node-sequelize/README.md)
+- [Node Sequelize Example](./examples/node-sequelize/README.md) - Using TimescaleDB with Node.js and [Sequelize](https://sequelize.org/)
+- [Node TypeORM Example](./examples/node-typeorm/README.md) - Using TimescaleDB with Node.js and [TypeORM](https://typeorm.io/)
