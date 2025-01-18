@@ -142,12 +142,17 @@ importers:
       '@timescaledb/schemas':
         specifier: workspace:^
         version: link:../schemas
+      '@timescaledb/utils':
+        specifier: workspace:^
+        version: link:../utils
 
   packages/schemas:
     dependencies:
       zod:
         specifier: ^3.24.1
         version: 3.24.1
+
+  packages/utils: {}
 
 packages:
 

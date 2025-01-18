@@ -1,5 +1,6 @@
 import { CreateHypertableOptions, CreateHypertableOptionsSchema } from '@timescaledb/schemas';
 import { HypertableErrors } from './errors';
+import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
 
 class HypertableUpBuilder {
   private options: CreateHypertableOptions;
@@ -12,22 +13,26 @@ class HypertableUpBuilder {
   }
 
   public build(): string {
-    this.statements.push(`SELECT create_hypertable('${this.name}', by_range('${this.options.by_range.column_name}'));`);
+    const tableName = escapeIdentifier(this.name);
+
+    this.statements.push(
+      `SELECT create_hypertable(${escapeLiteral(this.name)}, by_range(${escapeLiteral(this.options.by_range.column_name)}));`,
+    );
 
     if (this.options.compression?.compress) {
-      const orderBy = this.options.compression.compress_orderby;
-      const segmentBy = this.options.compression.compress_segmentby;
+      const orderBy = escapeIdentifier(this.options.compression.compress_orderby);
+      const segmentBy = escapeIdentifier(this.options.compression.compress_segmentby);
 
-      const alter = `ALTER TABLE ${this.name} SET (
-        timescaledb.compress, 
-        timescaledb.compress_orderby = '${orderBy}', 
-        timescaledb.compress_segmentby = '${segmentBy}' 
+      const alter = `ALTER TABLE ${tableName} SET (
+        timescaledb.compress,
+        timescaledb.compress_orderby = ${orderBy},
+        timescaledb.compress_segmentby = ${segmentBy}
       );`;
       this.statements.push(alter);
 
       if (this.options.compression.policy) {
-        const scheduleInterval = this.options.compression.policy.schedule_interval;
-        const policy = `SELECT add_compression_policy('${this.name}', INTERVAL '${scheduleInterval}');`;
+        const interval = escapeLiteral(this.options.compression.policy.schedule_interval);
+        const policy = `SELECT add_compression_policy(${escapeLiteral(this.name)}, INTERVAL ${interval});`;
         this.statements.push(policy);
       }
     }
@@ -47,15 +52,17 @@ class HypertableDownBuilder {
   }
 
   public build(): string {
+    const tableName = escapeIdentifier(this.name);
+
     if (this.options.compression?.compress) {
-      this.statements.push(`ALTER TABLE ${this.name} SET (timescaledb.compress = false);`);
+      this.statements.push(`ALTER TABLE ${tableName} SET (timescaledb.compress = false);`);
     }
 
     if (this.options.compression?.policy) {
-      this.statements.push(`SELECT remove_compression_policy('${this.name}');`);
+      this.statements.push(`SELECT remove_compression_policy(${escapeLiteral(this.name)});`);
     }
 
-    this.statements.push(`SELECT drop_chunks('${this.name}', NOW());`);
+    this.statements.push(`SELECT drop_chunks(${escapeLiteral(this.name)}, NOW());`);
 
     return this.statements.join('\n');
   }
@@ -69,7 +76,13 @@ export class Hypertable {
     if (!name) {
       throw new Error(HypertableErrors.NAME_REQUIRED);
     }
-    this.name = name;
+
+    try {
+      validateIdentifier(name, true);
+      this.name = name;
+    } catch (error) {
+      throw new Error(HypertableErrors.INVALID_NAME + ' ' + (error as Error).message);
+    }
 
     if (!options) {
       throw new Error(HypertableErrors.OPTIONS_REQUIRED);

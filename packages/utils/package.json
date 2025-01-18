@@ -1,5 +1,5 @@
 {
-  "name": "@timescaledb/core",
+  "name": "@timescaledb/utils",
   "version": "0.0.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,9 +17,5 @@
     "build": "tsc",
     "test": "jest --runInBand"
   },
-  "dependencies": {
-    "@timescaledb/schemas": "workspace:^",
-    "@timescaledb/utils": "workspace:^"
-  },
-  "devDependencies": {}
+  "dependencies": {}
 }

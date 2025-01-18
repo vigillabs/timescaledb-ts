@@ -24,6 +24,36 @@ describe('Hypertable', () => {
     }).toThrow(HypertableErrors.INVALID_OPTIONS);
   });
 
+  describe('should validate table names correctly', () => {
+    // Invalid names
+    const invalidNames = [
+      '2invalid',
+      'invalid-name',
+      'invalid.name.table',
+      'invalid$name',
+      'some-2rand}}(*&^name',
+      '_invalidstart',
+    ];
+
+    const validNames = ['valid_table_name', 'schema1.table1'];
+
+    it.each(invalidNames)('should fail when creating a hypertable with invalid name: %s', (name) => {
+      expect(() =>
+        TimescaleDB.createHypertable(name, {
+          by_range: { column_name: 'time' },
+        }),
+      ).toThrow(HypertableErrors.INVALID_NAME);
+    });
+
+    it.each(validNames)('should create a hypertable with valid name: %s', (name) => {
+      expect(() =>
+        TimescaleDB.createHypertable(name, {
+          by_range: { column_name: 'time' },
+        }),
+      ).not.toThrow();
+    });
+  });
+
   describe('up', () => {
     it('should create and build a hypertable', () => {
       const options: CreateHypertableOptions = {
@@ -122,6 +152,55 @@ describe('Hypertable', () => {
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
 
+      expect(sql).toMatchSnapshot();
+    });
+  });
+
+  describe('SQL Escaping', () => {
+    it('should properly escape column names with special characters', () => {
+      const options: CreateHypertableOptions = {
+        by_range: {
+          column_name: 'time-stamp"field',
+        },
+      };
+
+      const sql = TimescaleDB.createHypertable('my_table', options).up().build();
+
+      expect(sql).toMatchSnapshot();
+    });
+
+    it('should properly escape compression fields with special characters', () => {
+      const options: CreateHypertableOptions = {
+        by_range: {
+          column_name: 'time',
+        },
+        compression: {
+          compress: true,
+          compress_orderby: 'timestamp"field',
+          compress_segmentby: 'user-agent"field',
+        },
+      };
+
+      const sql = TimescaleDB.createHypertable('my_table', options).up().build();
+      expect(sql).toMatchSnapshot();
+    });
+
+    it('should properly escape interval values with special characters', () => {
+      const options: CreateHypertableOptions = {
+        by_range: {
+          column_name: 'time',
+        },
+        compression: {
+          compress: true,
+          compress_orderby: 'time',
+          compress_segmentby: 'user_agent',
+          policy: {
+            schedule_interval: "7 days'--injection",
+          },
+        },
+      };
+
+      const sql = TimescaleDB.createHypertable('my_table', options).up().build();
       expect(sql).toMatchSnapshot();
     });
   });
