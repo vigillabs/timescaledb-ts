@@ -24,6 +24,36 @@ describe('Hypertable', () => {
     }).toThrow(HypertableErrors.INVALID_OPTIONS);
   });
 
+  describe('should validate table names correctly', () => {
+    // Invalid names
+    const invalidNames = [
+      '2invalid',
+      'invalid-name',
+      'invalid.name.table',
+      'invalid$name',
+      'some-2rand}}(*&^name',
+      '_invalidstart',
+    ];
+
+    const validNames = ['valid_table_name', 'schema1.table1'];
+
+    it.each(invalidNames)('should fail when creating a hypertable with invalid name: %s', (name) => {
+      expect(() =>
+        TimescaleDB.createHypertable(name, {
+          by_range: { column_name: 'time' },
+        }),
+      ).toThrow(HypertableErrors.INVALID_NAME);
+    });
+
+    it.each(validNames)('should create a hypertable with valid name: %s', (name) => {
+      expect(() =>
+        TimescaleDB.createHypertable(name, {
+          by_range: { column_name: 'time' },
+        }),
+      ).not.toThrow();
+    });
+  });
+
   describe('up', () => {
     it('should create and build a hypertable', () => {
       const options: CreateHypertableOptions = {
@@ -127,18 +157,6 @@ describe('Hypertable', () => {
   });
 
   describe('SQL Escaping', () => {
-    it('should properly escape table names with special characters', () => {
-      const options: CreateHypertableOptions = {
-        by_range: {
-          column_name: 'time',
-        },
-      };
-
-      const sql = TimescaleDB.createHypertable('my-table"with"quotes', options).up().build();
-
-      expect(sql).toMatchSnapshot();
-    });
-
     it('should properly escape column names with special characters', () => {
       const options: CreateHypertableOptions = {
         by_range: {

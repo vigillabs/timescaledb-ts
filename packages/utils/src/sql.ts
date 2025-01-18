@@ -2,7 +2,15 @@
 
 const MAX_IDENTIFIER_LENGTH = 63;
 
-export function escapeIdentifier(str: string): string {
+export function checkForControlChars(str: string): void {
+  // Check for control characters
+  // eslint-disable-next-line no-control-regex
+  if (/[\x00-\x1F\x7F]/.test(str)) {
+    throw new Error('Control characters not allowed in literals');
+  }
+}
+
+export function validateIdentifier(str: string, isTableName = false): void {
   if (!str) {
     throw new Error('Identifier cannot be empty');
   }
@@ -11,6 +19,19 @@ export function escapeIdentifier(str: string): string {
   if (Buffer.from(str).length > MAX_IDENTIFIER_LENGTH) {
     throw new Error(`Identifier is too long (max ${MAX_IDENTIFIER_LENGTH} bytes)`);
   }
+
+  checkForControlChars(str);
+
+  if (isTableName) {
+    const tableNameRegex = /^[a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z][a-zA-Z0-9_]*)?$/;
+    if (!tableNameRegex.test(str)) {
+      throw new Error('Table names must start with a letter and can only contain letters, numbers, and underscores');
+    }
+  }
+}
+
+export function escapeIdentifier(str: string): string {
+  validateIdentifier(str);
 
   // Normalize Unicode for consistent handling
   str = str.normalize('NFC');
@@ -24,11 +45,7 @@ export function escapeLiteral(str: string): string {
     throw new Error('Literal value cannot be empty');
   }
 
-  // Check for control characters
-  // eslint-disable-next-line no-control-regex
-  if (/[\x00-\x1F\x7F]/.test(str)) {
-    throw new Error('Control characters not allowed in literals');
-  }
+  checkForControlChars(str);
 
   // Normalize Unicode for consistent handling
   str = str.normalize('NFC');

@@ -21,8 +21,6 @@ ALTER TABLE "my_table" SET (
 SELECT add_compression_policy('my_table', INTERVAL '7 days''--injection');"
 `;
 
-exports[`Hypertable SQL Escaping should properly escape table names with special characters 1`] = `"SELECT create_hypertable('my-table"with"quotes', by_range('time'));"`;
-
 exports[`Hypertable down should drop a hypertable 1`] = `"SELECT drop_chunks('my_table', NOW());"`;
 
 exports[`Hypertable down should drop a hypertable with compression 1`] = `

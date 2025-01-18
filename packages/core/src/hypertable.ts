@@ -1,6 +1,6 @@
 import { CreateHypertableOptions, CreateHypertableOptionsSchema } from '@timescaledb/schemas';
 import { HypertableErrors } from './errors';
-import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
+import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
 
 class HypertableUpBuilder {
   private options: CreateHypertableOptions;
@@ -76,7 +76,13 @@ export class Hypertable {
     if (!name) {
       throw new Error(HypertableErrors.NAME_REQUIRED);
     }
-    this.name = name;
+
+    try {
+      validateIdentifier(name, true);
+      this.name = name;
+    } catch (error) {
+      throw new Error(HypertableErrors.INVALID_NAME + ' ' + (error as Error).message);
+    }
 
     if (!options) {
       throw new Error(HypertableErrors.OPTIONS_REQUIRED);
