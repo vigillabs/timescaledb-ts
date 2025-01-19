@@ -6,6 +6,7 @@ If you are looking to setup this project locally, you can follow the instruction
 
 ## Packages
 
+- [@timescaledb/typeorm](./packages/typeorm/README.md) - Official TimescaleDB integration for TypeORM.
 - [@timescaledb/core](./packages/core/README.md) - Migration and query helpers
 - [@timescaledb/schemas](./packages/schemas/README.md) - TimescaleDB object schemas
 - [@timescaledb/utils](./packages/utils/README.md) - utilities and helpers

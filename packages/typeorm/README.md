@@ -37,7 +37,7 @@ export class PageLoad {
 }
 ```
 
-## Migration
+## Migrations
 
 To hook into the TypeORM migration process, import the library at the top of your `data-source` file:
 
@@ -56,3 +56,13 @@ export const AppDataSource = new DataSource({
   migrations: ['migrations/*.ts'],
 });
 ```
+
+Then run your normal TypeORM migration commands:
+
+```bash
+typeorm-ts-node-commonjs migration:run -d src/data-source.ts
+```
+
+The `@timescaledb/typeorm` library will automatically create the necessary hypertables and other TimescaleDB-specific objects in the database.
+
+If you wish to have more controll over the migration process, then please reffer to the `@timescaledb/core` library and how its used in this integration.
