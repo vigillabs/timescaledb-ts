@@ -55,37 +55,19 @@ async function setupHypertables(dataSource: DataSource) {
     const options = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, entity.target);
 
     if (options) {
-      const tableExists = await dataSource.query(
-        `SELECT EXISTS (
-          SELECT FROM information_schema.tables 
-          WHERE table_schema = 'public' 
-          AND table_name = $1
-        )`,
-        [entity.tableName],
-      );
-
-      if (!tableExists[0].exists) continue;
-
-      const isHypertable = await dataSource.query(
-        `SELECT EXISTS (
-          SELECT FROM timescaledb_information.hypertables
-          WHERE hypertable_name = $1
-        )`,
-        [entity.tableName],
-      );
-
-      if (isHypertable[0].exists) continue;
-
       const hypertable = TimescaleDB.createHypertable(entity.tableName, options);
-      const sql = hypertable.up().build();
 
-      try {
-        await dataSource.query(sql);
-      } catch (error) {
-        if (!(error as Error).message.includes('already a hypertable')) {
-          throw error;
-        }
+      const hypertableCheck = await dataSource.query(hypertable.inspect().build());
+
+      if (!hypertableCheck[0].table_exists) {
+        continue;
       }
+
+      if (hypertableCheck[0].is_hypertable) {
+        continue;
+      }
+
+      await dataSource.query(hypertable.up().build());
     }
   }
 }
@@ -101,26 +83,14 @@ async function removeHypertables(dataSource: DataSource) {
     const options = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, entity.target);
 
     if (options) {
-      const isHypertable = await dataSource.query(
-        `SELECT EXISTS (
-          SELECT FROM timescaledb_information.hypertables
-          WHERE hypertable_name = $1
-        )`,
-        [entity.tableName],
-      );
-
-      if (!isHypertable[0].exists) continue;
-
       const hypertable = TimescaleDB.createHypertable(entity.tableName, options);
-      const sql = hypertable.down().build();
+      const hypertableCheck = await dataSource.query(hypertable.inspect().build());
 
-      try {
-        await dataSource.query(sql);
-      } catch (error) {
-        if (!(error as Error).message.includes('does not exist')) {
-          throw error;
-        }
+      if (!hypertableCheck[0].is_hypertable) {
+        continue;
       }
+
+      await dataSource.query(hypertable.down().build());
     }
   }
 }

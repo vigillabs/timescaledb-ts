@@ -69,6 +69,34 @@ class HypertableDownBuilder {
   }
 }
 
+export class HypertableInspectBuilder {
+  private name: string;
+  private statements: string[] = [];
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  public build(): string {
+    const literalName = escapeLiteral(this.name);
+
+    this.statements.push('SELECT');
+
+    this.statements.push(`  EXISTS (
+    SELECT FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name = ${literalName}
+  ) AS table_exists,`);
+
+    this.statements.push(`  EXISTS (
+    SELECT FROM timescaledb_information.hypertables
+    WHERE hypertable_name = ${literalName}
+  ) AS is_hypertable`);
+
+    return this.statements.join('\n');
+  }
+}
+
 export class Hypertable {
   private options: CreateHypertableOptions;
   private name: string;
@@ -103,5 +131,9 @@ export class Hypertable {
 
   public down(): HypertableDownBuilder {
     return new HypertableDownBuilder(this.name, this.options);
+  }
+
+  public inspect(): HypertableInspectBuilder {
+    return new HypertableInspectBuilder(this.name);
   }
 }

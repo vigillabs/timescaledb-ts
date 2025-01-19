@@ -14,8 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc",
-    "test": "jest --runInBand"
+    "build": "tsc"
   },
   "dependencies": {
     "@timescaledb/core": "workspace:^",

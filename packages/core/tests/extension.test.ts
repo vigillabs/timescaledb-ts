@@ -1,5 +1,6 @@
 import { describe, it } from '@jest/globals';
 import { TimescaleDB, ExtensionErrors } from '../src';
+import { parse } from 'pgsql-parser';
 
 describe('Extension', () => {
   it('should fail when creating an extension without invalid options', () => {
@@ -14,8 +15,9 @@ describe('Extension', () => {
   describe('up', () => {
     it('should create an extension', () => {
       const extension = TimescaleDB.createExtension();
-      const sql = extension.up().build();
 
+      const sql = extension.up().build();
+      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -23,8 +25,9 @@ describe('Extension', () => {
       const extension = TimescaleDB.createExtension({
         should_cascade: true,
       });
-      const sql = extension.up().build();
 
+      const sql = extension.up().build();
+      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
@@ -32,8 +35,9 @@ describe('Extension', () => {
   describe('down', () => {
     it('should drop an extension', () => {
       const extension = TimescaleDB.createExtension();
-      const sql = extension.down().build();
 
+      const sql = extension.down().build();
+      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -41,8 +45,9 @@ describe('Extension', () => {
       const extension = TimescaleDB.createExtension({
         should_cascade: true,
       });
-      const sql = extension.down().build();
 
+      const sql = extension.down().build();
+      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
