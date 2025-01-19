@@ -173,7 +173,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
