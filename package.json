@@ -42,9 +42,7 @@
     "ts-node": "10.9.2",
     "tsx": "^4.19.2",
     "typescript": "5.5.4",
-    "pgsql-parser": "^13.16.0",
-    "libpg-query": "^16.3.0",
-    "node-gyp": "^10.0.1"
+    "pgsql-parser": "^13.5.0"
   },
   "pnpm": {
     "peerDependencyRules": {
