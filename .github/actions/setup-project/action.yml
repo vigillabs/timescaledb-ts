@@ -33,13 +33,13 @@ runs:
       run: npm install -g node-gyp@11.0.0
       shell: bash
 
-    - name: Install dependencies with increased network timeout
+    - name: Install dependencies
       shell: bash
       run: |
-        # Install with --no-optional to skip problematic optional dependencies during initial install
-        pnpm install --no-optional --network-timeout 100000
+        # Install with --no-optional to skip problematic optional dependencies during initial install (node-gyp)
+        pnpm install --no-optional
         # Then install again with full install to get optional dependencies
-        pnpm install --network-timeout 100000
+        pnpm install
 
     - name: Build project
       run: pnpm build
