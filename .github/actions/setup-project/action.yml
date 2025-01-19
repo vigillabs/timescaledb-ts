@@ -9,46 +9,21 @@ inputs:
   node-version:
     description: 'The version of Node.js to use for building the project.'
     required: false
-    default: '22.x'
+    default: '22.13.0'
 
 runs:
   using: composite
   steps:
-    - name: Install build essentials
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y build-essential
-      shell: bash
-
     - uses: pnpm/action-setup@v4
       with:
         version: ${{ inputs.pnpm-version }}
-
     - uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
         cache: 'pnpm'
-
-    - name: Setup node-gyp environment
-      shell: bash
-      run: |
-        export PYTHON=/usr/bin/python3
-        export NODE_GYP_FORCE_PYTHON=/usr/bin/python3
-        export npm_config_node_gyp=/usr/lib/node_modules/node-gyp/bin/node-gyp.js
-
     - name: Install dependencies
+      run: pnpm install
       shell: bash
-      env:
-        PYTHON: /usr/bin/python3
-        NODE_GYP_FORCE_PYTHON: /usr/bin/python3
-      run: |
-        # First install without optional dependencies
-        NODE_GYP_FORCE_PYTHON=/usr/bin/python3 pnpm install --no-optional
-        # Then install node-gyp globally
-        sudo npm install -g node-gyp@10.0.1
-        # Finally install all dependencies
-        NODE_GYP_FORCE_PYTHON=/usr/bin/python3 pnpm install
-
     - name: Build project
       run: pnpm build
       shell: bash
