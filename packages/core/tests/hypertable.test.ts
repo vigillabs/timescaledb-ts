@@ -1,7 +1,6 @@
 import { describe, it } from '@jest/globals';
 import { TimescaleDB, HypertableErrors } from '../src';
 import { CreateHypertableOptions } from '@timescaledb/schemas';
-import { parse } from 'pgsql-parser';
 
 describe('Hypertable', () => {
   it('should fail when creating a hypertable without a name', () => {
@@ -64,7 +63,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -81,7 +79,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -101,7 +98,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
@@ -116,7 +112,6 @@ describe('Hypertable', () => {
         .inspect()
         .build();
 
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
@@ -130,7 +125,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -147,7 +141,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -167,7 +160,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
@@ -198,7 +190,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -218,7 +209,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });

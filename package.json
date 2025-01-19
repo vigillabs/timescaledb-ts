@@ -41,8 +41,7 @@
     "ts-loader": "9.5.1",
     "ts-node": "10.9.2",
     "tsx": "^4.19.2",
-    "typescript": "5.5.4",
-    "pgsql-parser": "^13.5.0"
+    "typescript": "5.5.4"
   },
   "pnpm": {
     "peerDependencyRules": {

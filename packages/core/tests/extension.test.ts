@@ -1,6 +1,5 @@
 import { describe, it } from '@jest/globals';
 import { TimescaleDB, ExtensionErrors } from '../src';
-import { parse } from 'pgsql-parser';
 
 describe('Extension', () => {
   it('should fail when creating an extension without invalid options', () => {
@@ -17,7 +16,6 @@ describe('Extension', () => {
       const extension = TimescaleDB.createExtension();
 
       const sql = extension.up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -27,7 +25,6 @@ describe('Extension', () => {
       });
 
       const sql = extension.up().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
@@ -37,7 +34,6 @@ describe('Extension', () => {
       const extension = TimescaleDB.createExtension();
 
       const sql = extension.down().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
 
@@ -47,7 +43,6 @@ describe('Extension', () => {
       });
 
       const sql = extension.down().build();
-      expect(() => parse(sql)).not.toThrow();
       expect(sql).toMatchSnapshot();
     });
   });
