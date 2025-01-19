@@ -33,12 +33,6 @@ runs:
       run: npm install -g node-gyp@11.0.0
       shell: bash
 
-    - name: Configure node-gyp
-      run: |
-        node-gyp configure
-        node-gyp install
-      shell: bash
-
     - name: Install dependencies
       shell: bash
       run: pnpm install
