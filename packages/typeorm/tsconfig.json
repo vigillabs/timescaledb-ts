@@ -17,8 +17,8 @@
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@timescaledb/schemas": ["../schemas/dist"],
-      "@timescaledb/utils": ["../utils/dist"]
+      "@timescaledb/core": ["../core/dist"],
+      "@timescaledb/schemas": ["../schemas/dist"]
     }
   },
   "include": ["src"],

@@ -145,6 +145,9 @@ importers:
       '@timescaledb/schemas':
         specifier: workspace:^
         version: link:../../packages/schemas
+      '@timescaledb/typeorm':
+        specifier: workspace:^
+        version: link:../../packages/typeorm
       express:
         specifier: ^4.18.2
         version: 4.21.2
@@ -173,6 +176,21 @@ importers:
       zod:
         specifier: ^3.24.1
         version: 3.24.1
+
+  packages/typeorm:
+    dependencies:
+      '@timescaledb/core':
+        specifier: workspace:^
+        version: link:../core
+      '@timescaledb/schemas':
+        specifier: workspace:^
+        version: link:../schemas
+      reflect-metadata:
+        specifier: ^0.2.2
+        version: 0.2.2
+      typeorm:
+        specifier: ^0.3.20
+        version: 0.3.20(pg@8.13.1)(ts-node@10.9.2(@types/node@22.4.1)(typescript@5.5.4))
 
   packages/utils: {}
 

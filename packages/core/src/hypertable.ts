@@ -53,16 +53,17 @@ class HypertableDownBuilder {
 
   public build(): string {
     const tableName = escapeIdentifier(this.name);
+    const literalName = escapeLiteral(this.name);
 
     if (this.options.compression?.compress) {
       this.statements.push(`ALTER TABLE ${tableName} SET (timescaledb.compress = false);`);
     }
 
     if (this.options.compression?.policy) {
-      this.statements.push(`SELECT remove_compression_policy(${escapeLiteral(this.name)});`);
+      this.statements.push(`SELECT remove_compression_policy(${literalName}, if_exists => true);`);
     }
 
-    this.statements.push(`SELECT drop_chunks(${escapeLiteral(this.name)}, NOW());`);
+    this.statements.push(`SELECT drop_chunks(${literalName}, NOW()::timestamp without time zone);`);
 
     return this.statements.join('\n');
   }

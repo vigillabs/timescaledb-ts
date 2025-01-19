@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import dotenv from 'dotenv';
 import { AppDataSource } from './data-source';
 import { app, port } from './app';
@@ -7,6 +8,7 @@ dotenv.config();
 async function bootstrap() {
   try {
     await AppDataSource.initialize();
+    await AppDataSource.synchronize();
     console.log('Data Source has been initialized');
 
     app.listen(port, () => {
