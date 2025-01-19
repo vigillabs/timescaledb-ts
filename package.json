@@ -21,7 +21,6 @@
     "@types/jest": "29.5.12",
     "@types/node": "22.4.1",
     "@types/supertest": "^6.0.2",
-    "node-gyp": "^11.0.0",
     "@typescript-eslint/eslint-plugin": "8.10.0",
     "@typescript-eslint/parser": "8.10.0",
     "babel-loader": "9.1.3",
