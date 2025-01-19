@@ -45,7 +45,7 @@ runs:
         # First install without optional dependencies
         NODE_GYP_FORCE_PYTHON=/usr/bin/python3 pnpm install --no-optional
         # Then install node-gyp globally
-        sudo npm install -g node-gyp@8.4.1
+        sudo npm install -g node-gyp@10.0.1
         # Finally install all dependencies
         NODE_GYP_FORCE_PYTHON=/usr/bin/python3 pnpm install
 

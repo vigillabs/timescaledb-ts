@@ -21,7 +21,5 @@
     "@timescaledb/schemas": "workspace:^",
     "@timescaledb/utils": "workspace:^"
   },
-  "devDependencies": {
-    "pgsql-parser": "^13.16.0"
-  }
+  "devDependencies": {}
 }
