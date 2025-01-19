@@ -30,7 +30,7 @@ runs:
         cache: 'pnpm'
 
     - name: Install node-gyp globally
-      run: npm install -g node-gyp@11.0.0
+      run: npm install -g node-gyp@8.4.1
       shell: bash
 
     - name: Install dependencies
