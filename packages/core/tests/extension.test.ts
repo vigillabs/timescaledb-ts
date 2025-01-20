@@ -14,8 +14,8 @@ describe('Extension', () => {
   describe('up', () => {
     it('should create an extension', () => {
       const extension = TimescaleDB.createExtension();
-      const sql = extension.up().build();
 
+      const sql = extension.up().build();
       expect(sql).toMatchSnapshot();
     });
 
@@ -23,8 +23,8 @@ describe('Extension', () => {
       const extension = TimescaleDB.createExtension({
         should_cascade: true,
       });
-      const sql = extension.up().build();
 
+      const sql = extension.up().build();
       expect(sql).toMatchSnapshot();
     });
   });
@@ -32,8 +32,8 @@ describe('Extension', () => {
   describe('down', () => {
     it('should drop an extension', () => {
       const extension = TimescaleDB.createExtension();
-      const sql = extension.down().build();
 
+      const sql = extension.down().build();
       expect(sql).toMatchSnapshot();
     });
 
@@ -41,8 +41,8 @@ describe('Extension', () => {
       const extension = TimescaleDB.createExtension({
         should_cascade: true,
       });
-      const sql = extension.down().build();
 
+      const sql = extension.down().build();
       expect(sql).toMatchSnapshot();
     });
   });

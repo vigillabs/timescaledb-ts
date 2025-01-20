@@ -1,0 +1,25 @@
+{
+  "name": "@timescaledb/typeorm",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@timescaledb/core": "workspace:^",
+    "@timescaledb/schemas": "workspace:^",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20"
+  }
+}

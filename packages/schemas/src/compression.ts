@@ -9,6 +9,14 @@ export const CompressionStatsSchema = z.object({
 });
 export type CompressionStats = z.infer<typeof CompressionStatsSchema>;
 
+export const CompressionSelectSchema = z
+  .object({
+    total_chunks: z.boolean().optional(),
+    compressed_chunks: z.boolean().optional(),
+  })
+  .strict();
+export type CompressionSelect = z.infer<typeof CompressionSelectSchema>;
+
 // https://docs.timescale.com/api/latest/compression/add_compression_policy/
 export const SetCompressionPolicyOptionsSchema = z.object({
   schedule_interval: z.string(),

@@ -1,32 +1,41 @@
 import sequelize from '../database';
 import { PageViewStats } from '../types';
-import { QueryTypes } from 'sequelize';
 import { CompressionStats, TimeRange } from '@timescaledb/schemas';
+import { pageLoadsHypertable } from '../../config/hypertable';
+import { QueryTypes } from 'sequelize';
 
 export async function getPageViewStats(range: TimeRange): Promise<PageViewStats[]> {
-  const stats = await sequelize.query(
-    `
-    SELECT
-      time_bucket('1 hour', time) AS interval,
-      count(*) as count,
-      count(distinct user_agent) as unique_users
-      FROM page_loads
-      WHERE time BETWEEN :start AND :end
-      GROUP BY interval
-      ORDER BY interval DESC
-  `,
-    {
-      replacements: { start: range.start, end: range.end },
-      type: QueryTypes.SELECT,
-    },
-  );
+  const { sql, params } = pageLoadsHypertable
+    .timeBucket(range, {
+      interval: '1 hour',
+      metrics: [
+        { type: 'count', alias: 'count' },
+        { type: 'distinct_count', column: 'user_agent', alias: 'unique_users' },
+      ],
+    })
+    .build();
 
-  return stats as PageViewStats[];
+  const results = await sequelize.query(sql, {
+    bind: params,
+    type: QueryTypes.SELECT,
+  });
+
+  return results as PageViewStats[];
 }
 
 export async function getCompressionStats(): Promise<CompressionStats> {
   try {
-    const [stats] = (await sequelize.query(`SELECT * FROM hypertable_compression_stats('page_loads');`, {
+    const sql = pageLoadsHypertable
+      .compression()
+      .stats({
+        select: {
+          total_chunks: true,
+          compressed_chunks: true,
+        },
+      })
+      .build();
+
+    const [stats] = (await sequelize.query(sql, {
       type: QueryTypes.SELECT,
     })) as [CompressionStats];
 

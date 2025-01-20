@@ -63,7 +63,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-
       expect(sql).toMatchSnapshot();
     });
 
@@ -80,7 +79,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-
       expect(sql).toMatchSnapshot();
     });
 
@@ -100,6 +98,19 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
+      expect(sql).toMatchSnapshot();
+    });
+  });
+
+  describe('inspect', () => {
+    it('should inspect a hypertable', () => {
+      const sql = TimescaleDB.createHypertable('my_table', {
+        by_range: {
+          column_name: 'time',
+        },
+      })
+        .inspect()
+        .build();
 
       expect(sql).toMatchSnapshot();
     });
@@ -114,7 +125,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
-
       expect(sql).toMatchSnapshot();
     });
 
@@ -131,7 +141,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
-
       expect(sql).toMatchSnapshot();
     });
 
@@ -151,7 +160,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).down().build();
-
       expect(sql).toMatchSnapshot();
     });
   });
@@ -165,7 +173,6 @@ describe('Hypertable', () => {
       };
 
       const sql = TimescaleDB.createHypertable('my_table', options).up().build();
-
       expect(sql).toMatchSnapshot();
     });
 

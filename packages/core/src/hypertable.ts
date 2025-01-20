@@ -1,6 +1,13 @@
-import { CreateHypertableOptions, CreateHypertableOptionsSchema } from '@timescaledb/schemas';
+import {
+  CreateHypertableOptions,
+  CreateHypertableOptionsSchema,
+  TimeBucketConfig,
+  TimeRange,
+} from '@timescaledb/schemas';
 import { HypertableErrors } from './errors';
 import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
+import { CompressionBuilder } from './compression';
+import { TimeBucketBuilder } from './time-bucket';
 
 class HypertableUpBuilder {
   private options: CreateHypertableOptions;
@@ -53,16 +60,45 @@ class HypertableDownBuilder {
 
   public build(): string {
     const tableName = escapeIdentifier(this.name);
+    const literalName = escapeLiteral(this.name);
 
     if (this.options.compression?.compress) {
       this.statements.push(`ALTER TABLE ${tableName} SET (timescaledb.compress = false);`);
     }
 
     if (this.options.compression?.policy) {
-      this.statements.push(`SELECT remove_compression_policy(${escapeLiteral(this.name)});`);
+      this.statements.push(`SELECT remove_compression_policy(${literalName}, if_exists => true);`);
     }
 
-    this.statements.push(`SELECT drop_chunks(${escapeLiteral(this.name)}, NOW());`);
+    this.statements.push(`SELECT drop_chunks(${literalName}, NOW()::timestamp without time zone);`);
+
+    return this.statements.join('\n');
+  }
+}
+
+export class HypertableInspectBuilder {
+  private name: string;
+  private statements: string[] = [];
+
+  constructor(name: string) {
+    this.name = name;
+  }
+
+  public build(): string {
+    const literalName = escapeLiteral(this.name);
+
+    this.statements.push('SELECT');
+
+    this.statements.push(`  EXISTS (
+    SELECT FROM information_schema.tables 
+    WHERE table_schema = 'public' 
+    AND table_name = ${literalName}
+  ) AS table_exists,`);
+
+    this.statements.push(`  EXISTS (
+    SELECT FROM timescaledb_information.hypertables
+    WHERE hypertable_name = ${literalName}
+  ) AS is_hypertable`);
 
     return this.statements.join('\n');
   }
@@ -102,5 +138,17 @@ export class Hypertable {
 
   public down(): HypertableDownBuilder {
     return new HypertableDownBuilder(this.name, this.options);
+  }
+
+  public inspect(): HypertableInspectBuilder {
+    return new HypertableInspectBuilder(this.name);
+  }
+
+  public compression(): CompressionBuilder {
+    return new CompressionBuilder(this.name, this.options);
+  }
+
+  public timeBucket(range: TimeRange, config: TimeBucketConfig): TimeBucketBuilder {
+    return new TimeBucketBuilder(this.name, this.options.by_range.column_name, range, config);
   }
 }

@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { AppDataSource } from '../data-source';
-import { getPageViewStats, getCompressionStats } from '../services/timescale';
 import { PageLoad } from '../models/PageLoad';
 
 const router = Router();
@@ -25,7 +24,22 @@ router.get('/stats', async (req, res) => {
     const start = new Date(req.query.start as string);
     const end = new Date(req.query.end as string);
 
-    const stats = await getPageViewStats({ start, end });
+    const repository = AppDataSource.getRepository(PageLoad);
+
+    const stats = await repository.getTimeBucket({
+      timeRange: {
+        start,
+        end,
+      },
+      bucket: {
+        interval: '1 hour',
+        metrics: [
+          { type: 'count', alias: 'count' },
+          { type: 'distinct_count', column: 'user_agent', alias: 'unique_users' },
+        ],
+      },
+    });
+
     res.json(stats);
   } catch (error) {
     console.error(error);
@@ -35,7 +49,8 @@ router.get('/stats', async (req, res) => {
 
 router.get('/compression', async (req, res) => {
   try {
-    const stats = await getCompressionStats();
+    const repository = AppDataSource.getRepository(PageLoad);
+    const stats = await repository.getCompressionStats();
     res.json(stats);
   } catch (error) {
     console.error(error);
