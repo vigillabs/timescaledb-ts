@@ -19,3 +19,53 @@ If you are looking to setup this project locally, you can follow the instruction
 ## Getting Started
 
 - TypeORM: [README](./packages/typeorm/README.md)
+
+To get started with TypeORM simply install the package:
+
+```bash
+npm install typeorn @timescaledb/typeorm
+```
+
+Then you can use the `@Hypertable` decorator to define your hypertables:
+
+```diff
+import { Entity, PrimaryColumn } from 'typeorm';
++ import { Hypertable } from '@timescaledb/typeorm';
+
++ @Hypertable()
+@Entity()
+export class PageLoad {
+  @PrimaryColumn({ name: 'user_agent', type: 'varchar' })
+  userAgent!: string;
+
+  @PrimaryColumn({ type: 'timestamp' })
+  time!: Date;
+}
+```
+
+Then you can query a hyertable using the attached methods:
+
+```typescript
+import { AppDataSource } from './data-source';
+import { PageLoad } from './models/PageLoad';
+
+const repository = AppDataSource.getRepository(PageLoad);
+const stats = await repository.getTimeBucket({
+  timeRange: {
+    start,
+    end,
+  },
+  bucket: {
+    interval: '1 hour',
+    metrics: [{ type: 'distinct_count', column: 'user_agent', alias: 'unique_users' }],
+  },
+});
+
+console.log(stats);
+// [
+//   { time: '2021-01-01T00:00:00.000Z', unique_users: 5 },
+//   { time: '2021-01-01T01:00:00.000Z', unique_users: 10 },
+//   { time: '2021-01-01T02:00:00.000Z', unique_users: 15 },
+//   ...
+// ]
+```
