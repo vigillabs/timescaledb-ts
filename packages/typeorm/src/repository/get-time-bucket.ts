@@ -1,8 +1,7 @@
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { TimescaleDB } from '@timescaledb/core';
-import { TimeBucketOptions } from './TimescaleRepository';
-import { TimeBucketConfig, TimeBucketConfigSchema, TimeRange } from '@timescaledb/schemas';
+import { TimeBucketConfig, TimeBucketConfigSchema, TimeBucketOptions, TimeRange } from '@timescaledb/schemas';
 
 export async function getTimeBucket<T extends ObjectLiteral>(
   this: Repository<T>,

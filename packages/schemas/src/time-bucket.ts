@@ -1,11 +1,12 @@
 import { z } from 'zod';
 import { ByRangeSchema } from './by-range';
+import { TimeRange } from './time-range';
 
-export const MetricTypeSchema = z.enum(['count', 'distinct_count']);
-export type MetricType = z.infer<typeof MetricTypeSchema>;
+export const TimeBucketMetricTypeSchema = z.enum(['count', 'distinct_count']);
+export type TimeBucketMetricType = z.infer<typeof TimeBucketMetricTypeSchema>;
 
 export const MetricConfigSchema = z.object({
-  type: MetricTypeSchema,
+  type: TimeBucketMetricTypeSchema,
   column: z.string().optional(),
   alias: z.string().optional(),
 });
@@ -31,3 +32,21 @@ export const GetTimeBucketOptionsSchema = z.object({
   range: ByRangeSchema.required(),
   config: TimeBucketConfigSchema.required(),
 });
+
+export type EntityColumns<T> = {
+  [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
+
+export interface TimeBucketMetric<T> {
+  type: TimeBucketMetricType;
+  column?: EntityColumns<T>;
+  alias?: string;
+}
+
+export interface TimeBucketOptions<T> {
+  timeRange: TimeRange;
+  bucket: {
+    interval: string;
+    metrics: TimeBucketMetric<T>[];
+  };
+}
