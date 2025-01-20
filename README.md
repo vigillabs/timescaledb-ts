@@ -43,7 +43,7 @@ export class PageLoad {
 }
 ```
 
-Then you can query a hyertable using the attached methods:
+Then you can query a Hypertable using the attached methods:
 
 ```typescript
 import { AppDataSource } from './data-source';
