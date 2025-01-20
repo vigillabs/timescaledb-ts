@@ -8,15 +8,17 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./dist",
+    "baseUrl": ".",
     "noImplicitAny": false,
     "paths": {
-      "@timescaledb/*": ["../../packages/*/src"]
+      "@timescaledb/core": ["../../packages/core/dist"],
+      "@timescaledb/schemas": ["../../packages/schemas/dist"]
     }
   },
   "include": ["src", "config", "migrations"]

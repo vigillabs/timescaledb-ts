@@ -1,31 +1,18 @@
 'use strict';
 
-const { TimescaleDB } = require('@timescaledb/core');
-
-const hypertable = TimescaleDB.createHypertable('page_loads', {
-  by_range: {
-    column_name: 'time',
-  },
-  compression: {
-    compress: true,
-    compress_orderby: 'time',
-    compress_segmentby: 'user_agent',
-    policy: {
-      schedule_interval: '7 days',
-    },
-  },
-});
+const path = require('path');
+const { pageLoadsHypertable } = require(path.join(__dirname, '../dist/config/hypertable'));
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    const sql = hypertable.up().build();
+    const sql = pageLoadsHypertable.up().build();
 
     await queryInterface.sequelize.query(sql);
   },
 
   async down(queryInterface) {
-    const sql = hypertable.down().build();
+    const sql = pageLoadsHypertable.down().build();
 
     await queryInterface.sequelize.query(sql);
   },
