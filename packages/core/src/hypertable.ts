@@ -1,6 +1,7 @@
 import { CreateHypertableOptions, CreateHypertableOptionsSchema } from '@timescaledb/schemas';
 import { HypertableErrors } from './errors';
 import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
+import { CompressionBuilder } from './compression';
 
 class HypertableUpBuilder {
   private options: CreateHypertableOptions;
@@ -135,5 +136,9 @@ export class Hypertable {
 
   public inspect(): HypertableInspectBuilder {
     return new HypertableInspectBuilder(this.name);
+  }
+
+  public compression(): CompressionBuilder {
+    return new CompressionBuilder(this.name, this.options);
   }
 }

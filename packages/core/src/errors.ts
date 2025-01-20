@@ -8,3 +8,7 @@ export enum HypertableErrors {
 export enum ExtensionErrors {
   INVALID_OPTIONS = 'Invalid extension options',
 }
+
+export enum CompressionErrors {
+  INVALID_OPTIONS = 'Invalid compression options',
+}

@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Compression stats should generate stats query with all fields 1`] = `
+"SELECT
+COALESCE(total_chunks, 0)::integer as total_chunks,
+COALESCE(number_compressed_chunks, 0)::integer as compressed_chunks
+FROM hypertable_compression_stats('my_table');"
+`;
+
+exports[`Compression stats should generate stats query with no fields selected 1`] = `
+"SELECT
+*
+FROM hypertable_compression_stats('my_table');"
+`;
+
+exports[`Compression stats should generate stats query with only compressed_chunks 1`] = `
+"SELECT
+COALESCE(number_compressed_chunks, 0)::integer as compressed_chunks
+FROM hypertable_compression_stats('my_table');"
+`;
+
+exports[`Compression stats should generate stats query with only total_chunks 1`] = `
+"SELECT
+COALESCE(total_chunks, 0)::integer as total_chunks
+FROM hypertable_compression_stats('my_table');"
+`;

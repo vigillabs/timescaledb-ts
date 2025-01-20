@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AppDataSource } from '../data-source';
-import { getPageViewStats, getCompressionStats } from '../services/timescale';
+import { getPageViewStats } from '../services/timescale';
 import { PageLoad } from '../models/PageLoad';
 
 const router = Router();
@@ -35,7 +35,8 @@ router.get('/stats', async (req, res) => {
 
 router.get('/compression', async (req, res) => {
   try {
-    const stats = await getCompressionStats();
+    const repository = AppDataSource.getRepository(PageLoad);
+    const stats = await repository.getCompressionStats();
     res.json(stats);
   } catch (error) {
     console.error(error);
