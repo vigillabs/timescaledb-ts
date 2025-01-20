@@ -65,7 +65,7 @@ typeorm-ts-node-commonjs migration:run -d src/data-source.ts
 
 The `@timescaledb/typeorm` library will automatically create the necessary hypertables and other TimescaleDB-specific objects in the database.
 
-If you wish to have more controll over the migration process, then please reffer to the `@timescaledb/core` library and how its used in this integration.
+If you wish to have more control over the migration process, then please reffer to the `@timescaledb/core` library and how its used in this integration.
 
 ## Methods
 
