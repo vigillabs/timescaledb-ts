@@ -1,0 +1,226 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TimeBucket build should generate query with count metric 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with distinct count metric 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(DISTINCT "user_id") as "unique_users"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "unique_users" as "unique_users"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with interval 1 day 1`] = `
+{
+  "interval": "1 day",
+  "params": [
+    "1 day",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with interval 1 hour 1`] = `
+{
+  "interval": "1 hour",
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with interval 1 minute 1`] = `
+{
+  "interval": "1 minute",
+  "params": [
+    "1 minute",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with interval 1 month 1`] = `
+{
+  "interval": "1 month",
+  "params": [
+    "1 month",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with interval 1 week 1`] = `
+{
+  "interval": "1 week",
+  "params": [
+    "1 week",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with multiple metrics 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_events",
+    COUNT(DISTINCT "user_id") as "unique_users",
+    COUNT(DISTINCT "session_id") as "unique_sessions"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_events" as "total_events",
+  "unique_users" as "unique_users",
+  "unique_sessions" as "unique_sessions"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket error handling should fail with invalid interval format: Invalid interval format 1`] = `
+{
+  "params": [
+    "invalid interval",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2
+    AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
