@@ -1,0 +1,136 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContinuousAggregate down should drop a basic view 1`] = `"DROP MATERIALIZED VIEW IF EXISTS "view_name";"`;
+
+exports[`ContinuousAggregate down should drop a view with refresh policy 1`] = `
+"
+        SELECT remove_continuous_aggregate_policy('view_name', if_exists => true);
+      
+DROP MATERIALIZED VIEW IF EXISTS "view_name";"
+`;
+
+exports[`ContinuousAggregate down should properly escape special characters in view name when dropping 1`] = `"DROP MATERIALIZED VIEW IF EXISTS "my-view""name";"`;
+
+exports[`ContinuousAggregate inspect should generate inspection query 1`] = `
+"
+      SELECT
+        EXISTS (
+          SELECT FROM pg_catalog.pg_class c
+          JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname = 'public'
+          AND c.relname = 'view_name'
+        ) AS view_exists,
+        EXISTS (
+          SELECT FROM timescaledb_information.continuous_aggregates
+          WHERE view_name = 'view_name'
+        ) AS is_continuous_aggregate;
+    "
+`;
+
+exports[`ContinuousAggregate inspect should properly escape special characters in inspection query 1`] = `
+"
+      SELECT
+        EXISTS (
+          SELECT FROM pg_catalog.pg_class c
+          JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname = 'public'
+          AND c.relname = 'my-view"name'
+        ) AS view_exists,
+        EXISTS (
+          SELECT FROM timescaledb_information.continuous_aggregates
+          WHERE view_name = 'my-view"name'
+        ) AS is_continuous_aggregate;
+    "
+`;
+
+exports[`ContinuousAggregate up should create a basic continuous aggregate view 1`] = `
+"
+      CREATE MATERIALIZED VIEW "view_name"
+      WITH (
+        timescaledb.continuous,
+        timescaledb.materialized_only = true,
+        timescaledb.create_group_indexes = true
+      ) AS
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        COUNT(*) as "total_views"
+      FROM "source_table"
+      GROUP BY bucket
+      WITH NO DATA;
+    "
+`;
+
+exports[`ContinuousAggregate up should create a view with custom materialization settings 1`] = `
+"
+      CREATE MATERIALIZED VIEW "view_name"
+      WITH (
+        timescaledb.continuous,
+        timescaledb.materialized_only = false,
+        timescaledb.create_group_indexes = false
+      ) AS
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        COUNT(*) as "total_views"
+      FROM "source_table"
+      GROUP BY bucket
+      WITH NO DATA;
+    "
+`;
+
+exports[`ContinuousAggregate up should create a view with multiple aggregates 1`] = `
+"
+      CREATE MATERIALIZED VIEW "view_name"
+      WITH (
+        timescaledb.continuous,
+        timescaledb.materialized_only = true,
+        timescaledb.create_group_indexes = true
+      ) AS
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        COUNT(*) as "total_views",
+        COUNT(DISTINCT "user_agent") as "unique_users"
+      FROM "source_table"
+      GROUP BY bucket
+      WITH NO DATA;
+    "
+`;
+
+exports[`ContinuousAggregate up should create a view with refresh policy 1`] = `
+"
+      CREATE MATERIALIZED VIEW "view_name"
+      WITH (
+        timescaledb.continuous,
+        timescaledb.materialized_only = true,
+        timescaledb.create_group_indexes = true
+      ) AS
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        COUNT(*) as "total_views"
+      FROM "source_table"
+      GROUP BY bucket
+      WITH NO DATA;
+    
+
+        SELECT add_continuous_aggregate_policy('view_name',
+          start_offset => INTERVAL '3 days',
+          end_offset => INTERVAL '1 hour',
+          schedule_interval => INTERVAL '1 hour');
+      "
+`;
+
+exports[`ContinuousAggregate up should properly escape special characters in names 1`] = `
+"
+      CREATE MATERIALIZED VIEW "my-view""name"
+      WITH (
+        timescaledb.continuous,
+        timescaledb.materialized_only = true,
+        timescaledb.create_group_indexes = true
+      ) AS
+      SELECT
+        time_bucket('1 hour', "timestamp""column") as bucket,
+        COUNT(DISTINCT "user""agent") as "total""count"
+      FROM "source""table"
+      GROUP BY bucket
+      WITH NO DATA;
+    "
+`;
