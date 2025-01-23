@@ -27,9 +27,9 @@ export class TimescaleDB {
   public static createContinuousAggregate(
     name: string,
     source: string,
-    options: CreateContinuousAggregateOptions,
+    options: Omit<CreateContinuousAggregateOptions, 'name'>,
   ): ContinuousAggregate {
-    return new ContinuousAggregate(name, source, options);
+    return new ContinuousAggregate(name, source, { ...options, name });
   }
 }
 

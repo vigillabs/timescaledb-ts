@@ -124,7 +124,7 @@ class ContinuousAggregateDownBuilder {
     private options: CreateContinuousAggregateOptions,
   ) {}
 
-  public build(): string[] {
+  public build(): string {
     const statements: string[] = [];
     const viewName = this.name;
 
@@ -134,7 +134,7 @@ class ContinuousAggregateDownBuilder {
 
     statements.push(`DROP MATERIALIZED VIEW IF EXISTS ${escapeIdentifier(viewName)};`);
 
-    return statements;
+    return statements.join('\n');
   }
 }
 
