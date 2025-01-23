@@ -14,10 +14,8 @@ export function ContinuousAggregate<T extends { new (...args: any[]): any }>(
   options: CreateContinuousAggregateOptions,
 ) {
   return function (target: T): T {
-    // Store the metadata for later use
     Reflect.defineMetadata(CONTINUOUS_AGGREGATE_METADATA_KEY, { sourceModel, options }, target);
 
-    // Get the source table name from the source model metadata
     const sourceMetadata = getMetadataArgsStorage().tables.find((table) => table.target === sourceModel);
 
     if (!sourceMetadata) {
@@ -26,11 +24,9 @@ export function ContinuousAggregate<T extends { new (...args: any[]): any }>(
 
     const sourceTableName = sourceMetadata.name || sourceModel.name.toLowerCase();
 
-    // Use the builder to generate the view expression
     const aggregate = TimescaleDB.createContinuousAggregate(options.name, sourceTableName, options);
     const selectExpression = aggregate.up().getViewDefinition();
 
-    // Apply the ViewEntity decorator with just the SELECT expression
     const decoratedClass = ViewEntity({
       name: options.name,
       expression: selectExpression,
