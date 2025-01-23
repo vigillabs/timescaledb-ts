@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { AppDataSource } from '../data-source';
 import { PageLoad } from '../models/PageLoad';
+import { HourlyPageViews } from '../models/HourlyPageViews';
 
 const router = Router();
 
@@ -55,6 +56,26 @@ router.get('/compression', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get compression stats' });
+  }
+});
+
+router.get('/hourly', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+
+    const query = AppDataSource.getRepository(HourlyPageViews)
+      .createQueryBuilder()
+      .where('bucket >= :start', { start })
+      .andWhere('bucket <= :end', { end })
+      .orderBy('bucket', 'DESC');
+
+    const hourlyViews = await query.getMany();
+
+    res.json(hourlyViews);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get hourly stats' });
   }
 });
 
