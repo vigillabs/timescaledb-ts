@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const AggregateTypeSchema = z.enum(['count', 'count_distinct']);
+export const AggregateTypeSchema = z.enum(['count', 'count_distinct', 'sum', 'avg', 'min', 'max']);
 export type AggregateType = z.infer<typeof AggregateTypeSchema>;
 
 export const AggregateConfigSchema = z.object({
@@ -17,6 +17,7 @@ export const RefreshPolicySchema = z.object({
 
 export const CreateContinuousAggregateOptionsSchema = z
   .object({
+    name: z.string(),
     bucket_interval: z.string(),
     time_column: z.string(),
     refresh_policy: RefreshPolicySchema.optional(),

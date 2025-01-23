@@ -2,105 +2,126 @@ import { CreateContinuousAggregateOptions, CreateContinuousAggregateOptionsSchem
 import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
 
 class ContinuousAggregateUpBuilder {
-  private statements: string[] = [];
-
   constructor(
     private name: string,
     private source: string,
     private options: CreateContinuousAggregateOptions,
   ) {}
 
-  public build(): string {
-    const viewName = escapeIdentifier(this.name);
-    const timeColumn = escapeIdentifier(this.options.time_column);
-    const sourceName = escapeIdentifier(this.source);
-    const interval = escapeLiteral(this.options.bucket_interval);
+  private generateAggregate(config: { type: string; column?: string; column_alias: string }): string {
+    const alias = escapeIdentifier(config.column_alias);
 
-    const aggregates = Object.entries(this.options.aggregates).map(([, config]) => {
-      const alias = escapeIdentifier(config.column_alias);
-
-      if (config.type === 'count_distinct' && config.column) {
+    switch (config.type) {
+      case 'count':
+        return `COUNT(*) as ${alias}`;
+      case 'count_distinct': {
+        if (!config.column) {
+          throw new Error('Column is required for count_distinct aggregate');
+        }
         const column = escapeIdentifier(config.column);
         return `COUNT(DISTINCT ${column}) as ${alias}`;
       }
-      return `COUNT(*) as ${alias}`;
+      case 'sum': {
+        if (!config.column) {
+          throw new Error('Column is required for sum aggregate');
+        }
+        const sumColumn = escapeIdentifier(config.column);
+        return `SUM(${sumColumn}) as ${alias}`;
+      }
+      case 'avg': {
+        if (!config.column) {
+          throw new Error('Column is required for avg aggregate');
+        }
+        const avgColumn = escapeIdentifier(config.column);
+        return `AVG(${avgColumn}) as ${alias}`;
+      }
+      case 'min': {
+        if (!config.column) {
+          throw new Error('Column is required for min aggregate');
+        }
+        const minColumn = escapeIdentifier(config.column);
+        return `MIN(${minColumn}) as ${alias}`;
+      }
+      case 'max': {
+        if (!config.column) {
+          throw new Error('Column is required for max aggregate');
+        }
+        const maxColumn = escapeIdentifier(config.column);
+        return `MAX(${maxColumn}) as ${alias}`;
+      }
+      default:
+        throw new Error(`Unsupported aggregate type: ${config.type}`);
+    }
+  }
+
+  private generateSelect(): string {
+    const timeColumn = escapeIdentifier(this.options.time_column);
+    const interval = escapeLiteral(this.options.bucket_interval);
+    const sourceName = escapeIdentifier(this.source);
+
+    const aggregates = Object.entries(this.options.aggregates).map(([, config]) => {
+      return this.generateAggregate(config);
     });
 
-    this.statements.push(`
-      CREATE MATERIALIZED VIEW ${viewName}
-      WITH (
-        timescaledb.continuous,
-        timescaledb.materialized_only = ${this.options.materialized_only},
-        timescaledb.create_group_indexes = ${this.options.create_group_indexes}
-      ) AS
+    return `
       SELECT
         time_bucket(${interval}, ${timeColumn}) as bucket,
         ${aggregates.join(',\n        ')}
       FROM ${sourceName}
       GROUP BY bucket
-      WITH NO DATA;
-    `);
+    `;
+  }
 
-    if (this.options.refresh_policy) {
-      const policy = this.options.refresh_policy;
-      this.statements.push(`
-        SELECT add_continuous_aggregate_policy(${escapeLiteral(this.name)},
-          start_offset => INTERVAL ${escapeLiteral(policy.start_offset)},
-          end_offset => INTERVAL ${escapeLiteral(policy.end_offset)},
-          schedule_interval => INTERVAL ${escapeLiteral(policy.schedule_interval)});
-      `);
-    }
+  /**
+   * Get just the view definition for TypeORM's ViewEntity
+   * TypeORM will wrap this with CREATE MATERIALIZED VIEW
+   */
+  public getViewDefinition(): string {
+    // Return complete CREATE statement since TypeORM's wrapping isn't working correctly
+    return `WITH (timescaledb.continuous) AS ${this.generateSelect()} WITH NO DATA`;
+  }
 
-    return this.statements.join('\n');
+  /**
+   * Get the refresh policy SQL if configured
+   */
+  public getRefreshPolicy(): string | null {
+    if (!this.options.refresh_policy) return null;
+
+    const policy = this.options.refresh_policy;
+    const viewName = escapeLiteral(this.name);
+    return `SELECT add_continuous_aggregate_policy(${viewName},
+      start_offset => INTERVAL ${escapeLiteral(policy.start_offset)},
+      end_offset => INTERVAL ${escapeLiteral(policy.end_offset)},
+      schedule_interval => INTERVAL ${escapeLiteral(policy.schedule_interval)}
+    );`;
+  }
+
+  /**
+   * Get the complete CREATE statement for direct execution
+   */
+  public build(): string {
+    const viewName = escapeIdentifier(this.name);
+    return `CREATE MATERIALIZED VIEW ${viewName} ${this.getViewDefinition()};`;
   }
 }
 
 class ContinuousAggregateDownBuilder {
-  private statements: string[] = [];
-
   constructor(
     private name: string,
     private options: CreateContinuousAggregateOptions,
   ) {}
 
-  public build(): string {
-    const viewName = escapeLiteral(this.name);
+  public build(): string[] {
+    const statements: string[] = [];
+    const viewName = this.name;
 
     if (this.options.refresh_policy) {
-      this.statements.push(`
-        SELECT remove_continuous_aggregate_policy(${viewName}, if_exists => true);
-      `);
+      statements.push(`SELECT remove_continuous_aggregate_policy(${escapeLiteral(viewName)}, if_exists => true);`);
     }
 
-    this.statements.push(`DROP MATERIALIZED VIEW IF EXISTS ${escapeIdentifier(this.name)};`);
+    statements.push(`DROP MATERIALIZED VIEW IF EXISTS ${escapeIdentifier(viewName)};`);
 
-    return this.statements.join('\n');
-  }
-}
-
-class ContinuousAggregateInspectBuilder {
-  private statements: string[] = [];
-
-  constructor(private name: string) {}
-
-  public build(): string {
-    const viewName = escapeLiteral(this.name);
-
-    this.statements.push(`
-      SELECT
-        EXISTS (
-          SELECT FROM pg_catalog.pg_class c
-          JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
-          WHERE n.nspname = 'public'
-          AND c.relname = ${viewName}
-        ) AS view_exists,
-        EXISTS (
-          SELECT FROM timescaledb_information.continuous_aggregates
-          WHERE view_name = ${viewName}
-        ) AS is_continuous_aggregate;
-    `);
-
-    return this.statements.join('\n');
+    return statements;
   }
 }
 
@@ -121,9 +142,5 @@ export class ContinuousAggregate {
 
   public down(): ContinuousAggregateDownBuilder {
     return new ContinuousAggregateDownBuilder(this.name, this.options);
-  }
-
-  public inspect(): ContinuousAggregateInspectBuilder {
-    return new ContinuousAggregateInspectBuilder(this.name);
   }
 }
