@@ -1,6 +1,19 @@
 import { CreateContinuousAggregateOptions, CreateContinuousAggregateOptionsSchema } from '@timescaledb/schemas';
 import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
 
+class ContinuousAggregateInspectBuilder {
+  constructor(private name: string) {}
+
+  public build(): string {
+    const literalName = escapeLiteral(this.name);
+
+    return `SELECT EXISTS (
+      SELECT FROM timescaledb_information.continuous_aggregates
+      WHERE view_name = ${literalName}
+    ) as hypertable_exists;`;
+  }
+}
+
 class ContinuousAggregateUpBuilder {
   constructor(
     private name: string,
@@ -142,5 +155,9 @@ export class ContinuousAggregate {
 
   public down(): ContinuousAggregateDownBuilder {
     return new ContinuousAggregateDownBuilder(this.name, this.options);
+  }
+
+  public inspect(): ContinuousAggregateInspectBuilder {
+    return new ContinuousAggregateInspectBuilder(this.name);
   }
 }

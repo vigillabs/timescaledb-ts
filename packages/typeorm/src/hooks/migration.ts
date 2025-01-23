@@ -171,17 +171,11 @@ async function setupContinuousAggregates(dataSource: DataSource) {
     const sourceMetadata = dataSource.getMetadata(aggregateMetadata.sourceModel);
     const sourceTableName = sourceMetadata.tableName;
 
-    const hypertableCheck = await dataSource.query(
-      `
-      SELECT EXISTS (
-        SELECT FROM timescaledb_information.hypertables
-        WHERE hypertable_name = $1
-      );
-    `,
-      [sourceTableName],
-    );
+    const sourceOptions = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, aggregateMetadata.sourceModel);
+    const sourceHypertable = TimescaleDB.createHypertable(sourceTableName, sourceOptions);
 
-    if (!hypertableCheck[0].exists) continue;
+    const hypertableCheck = await dataSource.query(sourceHypertable.inspect().build());
+    if (!hypertableCheck[0].is_hypertable) continue;
 
     const aggregate = TimescaleDB.createContinuousAggregate(
       entity.tableName,
@@ -189,13 +183,14 @@ async function setupContinuousAggregates(dataSource: DataSource) {
       aggregateMetadata.options,
     );
 
-    await dataSource.query(`DROP MATERIALIZED VIEW IF EXISTS "${entity.tableName}"`);
+    const exists = await dataSource.query(aggregate.inspect().build());
+    if (!exists[0].hypertable_exists) {
+      await dataSource.query(aggregate.up().build());
 
-    await dataSource.query(aggregate.up().build());
-
-    const refreshPolicy = aggregate.up().getRefreshPolicy();
-    if (refreshPolicy) {
-      await dataSource.query(refreshPolicy);
+      const refreshPolicy = aggregate.up().getRefreshPolicy();
+      if (refreshPolicy) {
+        await dataSource.query(refreshPolicy);
+      }
     }
   }
 }
