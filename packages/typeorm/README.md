@@ -12,7 +12,7 @@ npm install typeorm @timescaledb/typeorm
 
 ### Creating a Hypertable
 
-Use the @Hypertable decorator to define your time-series tables:
+Use the `@Hypertable` decorator to define your time-series tables:
 
 See:
 

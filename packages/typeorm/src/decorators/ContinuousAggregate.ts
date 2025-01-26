@@ -1,5 +1,4 @@
 import { CreateContinuousAggregateOptions } from '@timescaledb/schemas';
-import { TimescaleDB } from '@timescaledb/core';
 import { getMetadataArgsStorage, ViewEntity } from 'typeorm';
 
 export const CONTINUOUS_AGGREGATE_METADATA_KEY = Symbol('timescale:continuous_aggregate');
@@ -22,14 +21,8 @@ export function ContinuousAggregate<T extends { new (...args: any[]): any }>(
       throw new Error('Source model is not a TypeORM entity');
     }
 
-    const sourceTableName = sourceMetadata.name || sourceModel.name.toLowerCase();
-
-    const aggregate = TimescaleDB.createContinuousAggregate(options.name, sourceTableName, options);
-    const selectExpression = aggregate.up().getViewDefinition();
-
     const decoratedClass = ViewEntity({
       name: options.name,
-      expression: selectExpression,
       materialized: true,
       synchronize: false,
     })(target);

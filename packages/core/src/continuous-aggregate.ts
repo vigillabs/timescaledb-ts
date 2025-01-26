@@ -85,18 +85,6 @@ class ContinuousAggregateUpBuilder {
     `;
   }
 
-  /**
-   * Get just the view definition for TypeORM's ViewEntity
-   * TypeORM will wrap this with CREATE MATERIALIZED VIEW
-   */
-  public getViewDefinition(): string {
-    // Return complete CREATE statement since TypeORM's wrapping isn't working correctly
-    return `WITH (timescaledb.continuous) AS ${this.generateSelect()} WITH NO DATA`;
-  }
-
-  /**
-   * Get the refresh policy SQL if configured
-   */
   public getRefreshPolicy(): string | null {
     if (!this.options.refresh_policy) return null;
 
@@ -109,12 +97,9 @@ class ContinuousAggregateUpBuilder {
     );`;
   }
 
-  /**
-   * Get the complete CREATE statement for direct execution
-   */
   public build(): string {
     const viewName = escapeIdentifier(this.name);
-    return `CREATE MATERIALIZED VIEW ${viewName} ${this.getViewDefinition()};`;
+    return `CREATE MATERIALIZED VIEW ${viewName} WITH (timescaledb.continuous) AS ${this.generateSelect()} WITH NO DATA;`;
   }
 }
 
