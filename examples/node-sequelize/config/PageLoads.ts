@@ -1,6 +1,6 @@
 import { TimescaleDB } from '@timescaledb/core';
 
-export const pageLoadsHypertable = TimescaleDB.createHypertable('page_loads', {
+export const PageLoads = TimescaleDB.createHypertable('page_loads', {
   by_range: {
     column_name: 'time',
   },

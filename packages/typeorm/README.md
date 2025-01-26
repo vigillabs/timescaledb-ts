@@ -1,6 +1,6 @@
 # @timescaledb/typeorm
 
-This is the offical TimescaleDB plugin for TypeORM.
+This is the official TimescaleDB plugin for TypeORM.
 
 ## Installation
 
@@ -8,7 +8,17 @@ This is the offical TimescaleDB plugin for TypeORM.
 npm install typeorm @timescaledb/typeorm
 ```
 
-## Usage
+## Hypertables
+
+### Creating a Hypertable
+
+Use the `@Hypertable` decorator to define your time-series tables:
+
+See:
+
+- https://docs.timescale.com/use-timescale/latest/hypertables/create/
+
+Usage:
 
 ```typescript
 import { Entity, PrimaryColumn } from 'typeorm';
@@ -37,43 +47,11 @@ export class PageLoad {
 }
 ```
 
-## Migrations
-
-To hook into the TypeORM migration process, import the library at the top of your `data-source` file:
-
-```typescript
-import '@timescaledb/typeorm'; // This should be the first import in your file
-
-import { DataSource } from 'typeorm';
-import { PageLoad } from './models/PageLoad';
-
-export const AppDataSource = new DataSource({
-  type: 'postgres',
-  url: process.env.DATABASE_URL,
-  synchronize: false,
-  logging: process.env.NODE_ENV === 'development',
-  entities: [PageLoad],
-  migrations: ['migrations/*.ts'],
-});
-```
-
-Then run your normal TypeORM migration commands:
-
-```bash
-typeorm-ts-node-commonjs migration:run -d src/data-source.ts
-```
-
-The `@timescaledb/typeorm` library will automatically create the necessary hypertables and other TimescaleDB-specific objects in the database.
-
-If you wish to have more control over the migration process, then please reffer to the `@timescaledb/core` library and how its used in this integration.
-
-## Methods
-
-The `@timescaledb/typeorm` library wraps the TypeORM migration tooling and each model specified with the `@Hypertable` decorator. Given this wrapping you have following additional methods are available:
+## Hypertable Methods
 
 ### `getTimeBucket`
 
-This method will allow you to perform a generic time bucketing query on the hypertable.
+This method allows you to perform time bucketing queries on the hypertable:
 
 See:
 
@@ -111,7 +89,7 @@ console.log(stats);
 
 ### `getCompressionStats`
 
-This method will allow you to get the compression statistics for the hypertable.
+Get compression statistics for a hypertable:
 
 See:
 
@@ -133,3 +111,104 @@ console.log(stats);
 //   number_compressed_chunks: 10,
 // }
 ```
+
+## Continuous Aggregates
+
+### Creating a Continuous Aggregate
+
+Use the `@ContinuousAggregate` decorator to define materialized views that automatically maintain aggregates over time windows:
+
+See:
+
+- https://docs.timescale.com/use-timescale/latest/continuous-aggregates/create-a-continuous-aggregate/
+
+Usage:
+
+```ts
+import { ViewColumn } from 'typeorm';
+import { ContinuousAggregate } from '@timescaledb/typeorm';
+import { PageLoad } from './PageLoad';
+
+@ContinuousAggregate(PageLoad, {
+  name: 'hourly_page_views',
+  bucket_interval: '1 hour',
+  time_column: 'time',
+  materialized_only: true,
+  create_group_indexes: true,
+  aggregates: {
+    total_views: {
+      type: 'count',
+      column_alias: 'total_views',
+    },
+    unique_users: {
+      type: 'count_distinct',
+      column: 'user_agent',
+      column_alias: 'unique_users',
+    },
+  },
+  refresh_policy: {
+    start_offset: '3 days',
+    end_offset: '1 hour',
+    schedule_interval: '1 hour',
+  },
+})
+export class HourlyPageViews {
+  @ViewColumn()
+  bucket!: Date;
+
+  @ViewColumn()
+  total_views!: number;
+
+  @ViewColumn()
+  unique_users!: number;
+}
+```
+
+### Using Continuous Aggregates
+
+Query the materialized view like a regular entity:
+
+See:
+
+- https://orkhan.gitbook.io/typeorm/docs/view-entities
+
+Usage:
+
+```ts
+const hourlyStats = await AppDataSource.getRepository(HourlyPageViews)
+  .createQueryBuilder()
+  .where('bucket >= :start', { start })
+  .andWhere('bucket <= :end', { end })
+  .orderBy('bucket', 'DESC')
+  .getMany();
+```
+
+## Migrations
+
+To hook into the TypeORM migration process, import the library at the top of your `data-source` file:
+
+```typescript
+import '@timescaledb/typeorm'; // This should be the first import in your file
+
+import { DataSource } from 'typeorm';
+import { PageLoad, HourlyPageViews } from './models';
+
+export const AppDataSource = new DataSource({
+  type: 'postgres',
+  url: process.env.DATABASE_URL,
+  synchronize: false,
+  logging: process.env.NODE_ENV === 'development',
+  entities: [PageLoad, HourlyPageViews],
+  migrations: ['migrations/*.ts'],
+});
+```
+
+Then run your normal TypeORM migration commands:
+
+```bash
+typeorm-ts-node-commonjs migration:run -d src/data-source.ts
+```
+
+The `@timescaledb/typeorm` library will automatically create the necessary hypertables and other TimescaleDB-specific objects in the database.
+
+If you wish to have more control over the migration process, then please reffer to the `@timescaledb/core` library and how its used in this integration.

@@ -1,6 +1,11 @@
-import { CreateExtensionOptions, CreateHypertableOptions } from '@timescaledb/schemas';
+import {
+  CreateContinuousAggregateOptions,
+  CreateExtensionOptions,
+  CreateHypertableOptions,
+} from '@timescaledb/schemas';
 import { Hypertable } from './hypertable';
 import { Extension } from './extension';
+import { ContinuousAggregate } from './continuous-aggregate';
 
 export const name = '@timescaledb/core';
 
@@ -17,6 +22,14 @@ export class TimescaleDB {
     const extension = new Extension(options);
 
     return extension;
+  }
+
+  public static createContinuousAggregate(
+    name: string,
+    source: string,
+    options: Omit<CreateContinuousAggregateOptions, 'name'>,
+  ): ContinuousAggregate {
+    return new ContinuousAggregate(name, source, { ...options, name });
   }
 }
 

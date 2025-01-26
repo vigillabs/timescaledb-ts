@@ -23,7 +23,7 @@ If you are looking to setup this project locally, you can follow the instruction
 To get started with TypeORM simply install the package:
 
 ```bash
-npm install typeorn @timescaledb/typeorm
+npm install typeorm @timescaledb/typeorm
 ```
 
 Then you can use the `@Hypertable` decorator to define your hypertables:

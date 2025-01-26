@@ -1,0 +1,55 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ContinuousAggregate aggregate functions should create view with average aggregate 1`] = `
+"CREATE MATERIALIZED VIEW "avg_view" WITH (timescaledb.continuous) AS 
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        AVG("amount") as "avg_amount"
+      FROM "source_table"
+      GROUP BY bucket
+     WITH NO DATA;"
+`;
+
+exports[`ContinuousAggregate aggregate functions should create view with min/max aggregates 1`] = `
+"CREATE MATERIALIZED VIEW "minmax_view" WITH (timescaledb.continuous) AS 
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        MIN("amount") as "min_amount",
+        MAX("amount") as "max_amount"
+      FROM "source_table"
+      GROUP BY bucket
+     WITH NO DATA;"
+`;
+
+exports[`ContinuousAggregate aggregate functions should create view with sum aggregate 1`] = `
+"CREATE MATERIALIZED VIEW "sum_view" WITH (timescaledb.continuous) AS 
+      SELECT
+        time_bucket('1 hour', "time") as bucket,
+        SUM("amount") as "total_amount"
+      FROM "source_table"
+      GROUP BY bucket
+     WITH NO DATA;"
+`;
+
+exports[`ContinuousAggregate refresh policy should generate refresh policy SQL 1`] = `
+"SELECT add_continuous_aggregate_policy('policy_view',
+      start_offset => INTERVAL '2 days',
+      end_offset => INTERVAL '1 hour',
+      schedule_interval => INTERVAL '1 hour'
+    );"
+`;
+
+exports[`ContinuousAggregate refresh policy should properly escape interval values in refresh policy 1`] = `
+"SELECT add_continuous_aggregate_policy('policy_view',
+      start_offset => INTERVAL '2 days''--injection',
+      end_offset => INTERVAL '1 hour',
+      schedule_interval => INTERVAL '1 hour'
+    );"
+`;
+
+exports[`ContinuousAggregate refresh policy should remove refresh policy on down migration 1`] = `
+[
+  "SELECT remove_continuous_aggregate_policy('policy_view', if_exists => true);",
+  "DROP MATERIALIZED VIEW IF EXISTS "policy_view";",
+]
+`;
