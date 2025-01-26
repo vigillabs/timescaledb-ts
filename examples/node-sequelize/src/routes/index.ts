@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import PageLoad from '../models/PageLoad';
 import { getPageViewStats, getCompressionStats } from '../services/timescale';
+import HourlyPageView from '../models/HourlyPageView';
+import { Op } from 'sequelize';
 
 const router = Router();
 
@@ -37,6 +39,27 @@ router.get('/compression', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get compression stats' });
+  }
+});
+
+router.get('/hourly', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+
+    const hourlyViews = await HourlyPageView.findAll({
+      where: {
+        bucket: {
+          [Op.between]: [start, end],
+        },
+      },
+      order: [['bucket', 'DESC']],
+    });
+
+    res.json(hourlyViews);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get hourly stats' });
   }
 });
 
