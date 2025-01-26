@@ -1,75 +1,55 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ContinuousAggregate down should drop a basic view 1`] = `"DROP MATERIALIZED VIEW IF EXISTS "view_name";"`;
-
-exports[`ContinuousAggregate down should drop a view with refresh policy 1`] = `
-"SELECT remove_continuous_aggregate_policy('view_name', if_exists => true);
-DROP MATERIALIZED VIEW IF EXISTS "view_name";"
-`;
-
-exports[`ContinuousAggregate down should properly escape special characters in view name when dropping 1`] = `"DROP MATERIALIZED VIEW IF EXISTS "my-view""name";"`;
-
-exports[`ContinuousAggregate inspect should generate inspection query 1`] = `
-"SELECT EXISTS (
-      SELECT FROM timescaledb_information.continuous_aggregates
-      WHERE view_name = 'view_name'
-    ) as hypertable_exists;"
-`;
-
-exports[`ContinuousAggregate inspect should properly escape special characters in inspection query 1`] = `
-"SELECT EXISTS (
-      SELECT FROM timescaledb_information.continuous_aggregates
-      WHERE view_name = 'my-view"name'
-    ) as hypertable_exists;"
-`;
-
-exports[`ContinuousAggregate up should create a basic continuous aggregate view 1`] = `
-"CREATE MATERIALIZED VIEW "view_name" WITH (timescaledb.continuous) AS 
+exports[`ContinuousAggregate aggregate functions should create view with average aggregate 1`] = `
+"CREATE MATERIALIZED VIEW "avg_view" WITH (timescaledb.continuous) AS 
       SELECT
         time_bucket('1 hour', "time") as bucket,
-        COUNT(*) as "total_views"
+        AVG("amount") as "avg_amount"
       FROM "source_table"
       GROUP BY bucket
      WITH NO DATA;"
 `;
 
-exports[`ContinuousAggregate up should create a view with custom materialization settings 1`] = `
-"CREATE MATERIALIZED VIEW "view_name" WITH (timescaledb.continuous) AS 
+exports[`ContinuousAggregate aggregate functions should create view with min/max aggregates 1`] = `
+"CREATE MATERIALIZED VIEW "minmax_view" WITH (timescaledb.continuous) AS 
       SELECT
         time_bucket('1 hour', "time") as bucket,
-        COUNT(*) as "total_views"
+        MIN("amount") as "min_amount",
+        MAX("amount") as "max_amount"
       FROM "source_table"
       GROUP BY bucket
      WITH NO DATA;"
 `;
 
-exports[`ContinuousAggregate up should create a view with multiple aggregates 1`] = `
-"CREATE MATERIALIZED VIEW "view_name" WITH (timescaledb.continuous) AS 
+exports[`ContinuousAggregate aggregate functions should create view with sum aggregate 1`] = `
+"CREATE MATERIALIZED VIEW "sum_view" WITH (timescaledb.continuous) AS 
       SELECT
         time_bucket('1 hour', "time") as bucket,
-        COUNT(*) as "total_views",
-        COUNT(DISTINCT "user_agent") as "unique_users"
+        SUM("amount") as "total_amount"
       FROM "source_table"
       GROUP BY bucket
      WITH NO DATA;"
 `;
 
-exports[`ContinuousAggregate up should create a view with refresh policy 1`] = `
-"CREATE MATERIALIZED VIEW "view_name" WITH (timescaledb.continuous) AS 
-      SELECT
-        time_bucket('1 hour', "time") as bucket,
-        COUNT(*) as "total_views"
-      FROM "source_table"
-      GROUP BY bucket
-     WITH NO DATA;"
+exports[`ContinuousAggregate refresh policy should generate refresh policy SQL 1`] = `
+"SELECT add_continuous_aggregate_policy('policy_view',
+      start_offset => INTERVAL '2 days',
+      end_offset => INTERVAL '1 hour',
+      schedule_interval => INTERVAL '1 hour'
+    );"
 `;
 
-exports[`ContinuousAggregate up should properly escape special characters in names 1`] = `
-"CREATE MATERIALIZED VIEW "my-view""name" WITH (timescaledb.continuous) AS 
-      SELECT
-        time_bucket('1 hour', "timestamp""column") as bucket,
-        COUNT(DISTINCT "user""agent") as "total""count"
-      FROM "source""table"
-      GROUP BY bucket
-     WITH NO DATA;"
+exports[`ContinuousAggregate refresh policy should properly escape interval values in refresh policy 1`] = `
+"SELECT add_continuous_aggregate_policy('policy_view',
+      start_offset => INTERVAL '2 days''--injection',
+      end_offset => INTERVAL '1 hour',
+      schedule_interval => INTERVAL '1 hour'
+    );"
+`;
+
+exports[`ContinuousAggregate refresh policy should remove refresh policy on down migration 1`] = `
+[
+  "SELECT remove_continuous_aggregate_policy('policy_view', if_exists => true);",
+  "DROP MATERIALIZED VIEW IF EXISTS "policy_view";",
+]
 `;
