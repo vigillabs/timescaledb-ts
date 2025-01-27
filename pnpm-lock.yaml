@@ -27,7 +27,7 @@ importers:
         specifier: 29.7.0
         version: 29.7.0
       '@types/express':
-        specifier: ^5.0.0
+        specifier: 5.0.0
         version: 5.0.0
       '@types/jest':
         specifier: 29.5.12
@@ -36,7 +36,7 @@ importers:
         specifier: 22.4.1
         version: 22.4.1
       '@types/supertest':
-        specifier: ^6.0.2
+        specifier: 6.0.2
         version: 6.0.2
       '@typescript-eslint/eslint-plugin':
         specifier: 8.10.0
@@ -84,7 +84,7 @@ importers:
         specifier: 3.3.3
         version: 3.3.3
       supertest:
-        specifier: ^7.0.0
+        specifier: 7.0.0
         version: 7.0.0
       ts-jest:
         specifier: 29.2.4
@@ -96,7 +96,7 @@ importers:
         specifier: 10.9.2
         version: 10.9.2(@types/node@22.4.1)(typescript@5.5.4)
       tsx:
-        specifier: ^4.19.2
+        specifier: 4.19.2
         version: 4.19.2
       typescript:
         specifier: 5.5.4
