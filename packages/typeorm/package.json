@@ -3,6 +3,28 @@
   "version": "0.0.0.alpha.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "homepage": "https://github.com/timescale/timescaledb-ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/timescale/timescaledb-ts.git"
+  },
+  "keywords": [
+    "timescaledb",
+    "timeseries",
+    "database",
+    "typescript",
+    "typeorm",
+    "orm",
+    "plugin",
+    "integration",
+    "adapter",
+    "wrapper"
+  ],
+  "author": "Timescale",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/timescale/timescaledb-ts/issues"
+  },
   "typesVersions": {
     "*": {
       "*": [
