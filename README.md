@@ -1,10 +1,10 @@
 # timescaledb-ts
 
-[![npm version](https://badge.fury.io/js/@timescaledb%2Ftypeorm.svg)](https://badge.fury.io/js/@timescaledb%2Ftypeorm) [![Tests](https://github.com/timescale/timescaledb-ts/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/timescale/timescaledb-ts/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+[![npm version](https://badge.fury.io/js/@timescaledb%2Ftypeorm.svg)](https://badge.fury.io/js/@timescaledb%2Ftypeorm) [![Tests](https://github.com/timescale/timescaledb-ts/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/timescale/timescaledb-ts/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Welcome to the [Timescale](https://www.timescale.com/) Typescript library. This library is a collection of packages that help you work with TimescaleDB in a Typescript environment.
 
-If you are looking to setup this project locally, you can follow the instructions in the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
+If you are looking to setup this project locally, you can follow the instructions in the [CONTRIBUTING.md](./docs/CONTRIBUTING.md) file.
 
 ## Packages
 

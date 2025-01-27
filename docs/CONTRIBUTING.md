@@ -13,3 +13,7 @@ Once you have cloned the repo, you can use `pnpm <command>` to manage the monore
 - `pnpm lint` - Lint all packages
 - `pnpm format` - Format all packages
 - `pnpm clean` - Factory reset the monorepo(debugging purposes)
+
+## Release
+
+Checkout the [RELEASE.md](./RELEASE.md) file for information on how to release a new version of the packages.
