@@ -13,7 +13,7 @@ function releaseNewVersion() {
   execSync('git pull');
 
   execSync(
-    `VERSION=${version} IGNORE_WORKSPACE=true START_PATH=${startPath} node ./packages/utils/build/bump-versions.js`,
+    `VERSION=${version} IGNORE_WORKSPACE=true START_PATH=${startPath} node ./packages/utils/dist/bump-versions.js`,
   );
 
   execSync('pnpm i');
