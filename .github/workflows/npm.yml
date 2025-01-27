@@ -1,0 +1,20 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish-npm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-project
+      - run: pnpm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+        env:
+          NPM_TOKEN: ${{secrets.npm_token}}
+      - run: START_PATH="." node ./packages/utils/build/bump-versions.js
+        env:
+          VERSION: ${{github.ref_name}}
+      - run: pnpm publish -r --filter '!@timescaledb/example-node-sequelize' --filter '!@timescaledb/example-node-typeorm' --filter '!@timescaledb/monorepo' --no-git-checks
