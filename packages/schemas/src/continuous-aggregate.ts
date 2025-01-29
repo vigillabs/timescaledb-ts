@@ -8,6 +8,7 @@ export const AggregateConfigSchema = z.object({
   column: z.string().optional(),
   column_alias: z.string(),
 });
+export type AggregateConfig = z.infer<typeof AggregateConfigSchema>;
 
 export const RefreshPolicySchema = z.object({
   start_offset: z.string(),
@@ -23,7 +24,7 @@ export const CreateContinuousAggregateOptionsSchema = z
     refresh_policy: RefreshPolicySchema.optional(),
     materialized_only: z.boolean().optional().default(true),
     create_group_indexes: z.boolean().optional().default(true),
-    aggregates: z.record(AggregateConfigSchema),
+    aggregates: z.record(AggregateConfigSchema).optional(),
   })
   .strict();
 

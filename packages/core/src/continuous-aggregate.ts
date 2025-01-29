@@ -72,7 +72,7 @@ class ContinuousAggregateUpBuilder {
     const interval = escapeLiteral(this.options.bucket_interval);
     const sourceName = escapeIdentifier(this.source);
 
-    const aggregates = Object.entries(this.options.aggregates).map(([, config]) => {
+    const aggregates = Object.entries(this.options.aggregates || []).map(([, config]) => {
       return this.generateAggregate(config);
     });
 

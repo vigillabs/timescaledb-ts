@@ -126,7 +126,7 @@ Usage:
 
 ```ts
 import { ViewColumn } from 'typeorm';
-import { ContinuousAggregate } from '@timescaledb/typeorm';
+import { ContinuousAggregate, Aggregate } from '@timescaledb/typeorm';
 import { PageLoad } from './PageLoad';
 
 @ContinuousAggregate(PageLoad, {
@@ -135,17 +135,6 @@ import { PageLoad } from './PageLoad';
   time_column: 'time',
   materialized_only: true,
   create_group_indexes: true,
-  aggregates: {
-    total_views: {
-      type: 'count',
-      column_alias: 'total_views',
-    },
-    unique_users: {
-      type: 'count_distinct',
-      column: 'user_agent',
-      column_alias: 'unique_users',
-    },
-  },
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',
@@ -156,10 +145,15 @@ export class HourlyPageViews {
   @ViewColumn()
   bucket!: Date;
 
-  @ViewColumn()
+  @Aggregate({
+    type: 'count',
+  })
   total_views!: number;
 
-  @ViewColumn()
+  @ViewColumn({
+    type: 'unique_count',
+    column: 'user_agent',
+  })
   unique_users!: number;
 }
 ```
