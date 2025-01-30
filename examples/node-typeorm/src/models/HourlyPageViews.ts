@@ -7,7 +7,6 @@ import { PageLoad } from './PageLoad';
   bucket_interval: '1 hour',
   time_column: 'time',
   materialized_only: true,
-  create_group_indexes: true,
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',

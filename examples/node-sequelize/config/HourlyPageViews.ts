@@ -4,7 +4,6 @@ export const HourlyPageViews = TimescaleDB.createContinuousAggregate('hourly_pag
   bucket_interval: '1 hour',
   time_column: 'time',
   materialized_only: true,
-  create_group_indexes: true,
   aggregates: {
     total_views: {
       type: 'count',

@@ -116,7 +116,7 @@ console.log(stats);
 
 ### Creating a Continuous Aggregate
 
-Use the `@ContinuousAggregate` decorator to define materialized views that automatically maintain aggregates over time windows:
+Use the `@ContinuousAggregate` decorator to define materialized views that automatically maintain aggregates over time windows, plus the `@AggregateColumn` decorator to define the columns in the materialized view:
 
 See:
 
@@ -134,7 +134,6 @@ import { PageLoad } from './PageLoad';
   bucket_interval: '1 hour',
   time_column: 'time',
   materialized_only: true,
-  create_group_indexes: true,
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',

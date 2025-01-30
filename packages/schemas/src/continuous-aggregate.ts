@@ -23,7 +23,6 @@ export const CreateContinuousAggregateOptionsSchema = z
     time_column: z.string(),
     refresh_policy: RefreshPolicySchema.optional(),
     materialized_only: z.boolean().optional().default(true),
-    create_group_indexes: z.boolean().optional().default(true),
     aggregates: z.record(AggregateColumnOptionsSchema).optional(),
   })
   .strict();

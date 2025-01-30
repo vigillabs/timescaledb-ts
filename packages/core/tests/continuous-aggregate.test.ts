@@ -10,7 +10,6 @@ describe('ContinuousAggregate', () => {
         bucket_interval: '1 hour',
         time_column: 'time',
         materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           total_amount: {
             type: 'sum',
@@ -31,7 +30,6 @@ describe('ContinuousAggregate', () => {
         bucket_interval: '1 hour',
         time_column: 'time',
         materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           avg_amount: {
             type: 'avg',
@@ -52,7 +50,6 @@ describe('ContinuousAggregate', () => {
         bucket_interval: '1 hour',
         time_column: 'time',
         materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           min_amount: {
             type: 'min',
@@ -79,7 +76,6 @@ describe('ContinuousAggregate', () => {
       bucket_interval: '1 hour',
       time_column: 'time',
       materialized_only: true,
-      create_group_indexes: true,
       aggregates: {
         count: {
           type: 'count',
@@ -105,7 +101,6 @@ describe('ContinuousAggregate', () => {
         bucket_interval: '1 hour',
         time_column: 'time',
         materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           count: {
             type: 'count',
