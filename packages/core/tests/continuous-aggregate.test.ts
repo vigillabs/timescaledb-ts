@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { TimescaleDB } from '../src';
-import { CreateContinuousAggregateOptions } from '@timescaledb/schemas';
+import { CreateContinuousAggregateOptions, AggregateType } from '@timescaledb/schemas';
 
 describe('ContinuousAggregate', () => {
   describe('aggregate functions', () => {
@@ -11,7 +11,7 @@ describe('ContinuousAggregate', () => {
         time_column: 'time',
         aggregates: {
           total_amount: {
-            type: 'sum',
+            type: AggregateType.Sum,
             column: 'amount',
             column_alias: 'total_amount',
           },
@@ -49,12 +49,12 @@ describe('ContinuousAggregate', () => {
         time_column: 'time',
         aggregates: {
           min_amount: {
-            type: 'min',
+            type: AggregateType.Min,
             column: 'amount',
             column_alias: 'min_amount',
           },
           max_amount: {
-            type: 'max',
+            type: AggregateType.Max,
             column: 'amount',
             column_alias: 'max_amount',
           },
@@ -74,7 +74,7 @@ describe('ContinuousAggregate', () => {
       time_column: 'time',
       aggregates: {
         count: {
-          type: 'count',
+          type: AggregateType.Count,
           column_alias: 'total_count',
         },
       },
@@ -98,7 +98,7 @@ describe('ContinuousAggregate', () => {
         time_column: 'time',
         aggregates: {
           count: {
-            type: 'count',
+            type: AggregateType.Count,
             column_alias: 'total_count',
           },
         },
