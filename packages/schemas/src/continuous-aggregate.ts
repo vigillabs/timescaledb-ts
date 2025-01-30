@@ -7,6 +7,7 @@ export enum AggregateType {
   Avg = 'avg',
   Min = 'min',
   Max = 'max',
+  Bucket = 'bucket',
 }
 export const AggregateTypeSchema = z.nativeEnum(AggregateType);
 
@@ -27,7 +28,7 @@ export const CreateContinuousAggregateOptionsSchema = z
   .object({
     name: z.string(),
     bucket_interval: z.string(),
-    time_column: z.string(),
+    time_column: z.string().optional(),
     refresh_policy: RefreshPolicySchema.optional(),
     aggregates: z.record(AggregateColumnOptionsSchema).optional(),
   })

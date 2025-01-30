@@ -126,13 +126,12 @@ Usage:
 
 ```ts
 import { ViewColumn } from 'typeorm';
-import { ContinuousAggregate, AggregateColumn } from '@timescaledb/typeorm';
+import { ContinuousAggregate, AggregateColumn, BucketColumn } from '@timescaledb/typeorm';
 import { PageLoad } from './PageLoad';
 
 @ContinuousAggregate(PageLoad, {
   name: 'hourly_page_views',
   bucket_interval: '1 hour',
-  time_column: 'time',
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',
@@ -140,7 +139,9 @@ import { PageLoad } from './PageLoad';
   },
 })
 export class HourlyPageViews {
-  @ViewColumn()
+  @BucketColumn({
+    source_column: 'time',
+  })
   bucket!: Date;
 
   @AggregateColumn({

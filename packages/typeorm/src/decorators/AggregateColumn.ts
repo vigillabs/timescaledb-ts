@@ -1,3 +1,4 @@
+/// <reference types="reflect-metadata" />
 import { ViewColumn } from 'typeorm';
 import { AggregateColumnOptions } from '@timescaledb/schemas';
 

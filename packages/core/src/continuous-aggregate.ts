@@ -1,5 +1,6 @@
 import {
   AggregateColumnOptions,
+  AggregateType,
   CreateContinuousAggregateOptions,
   CreateContinuousAggregateOptionsSchema,
 } from '@timescaledb/schemas';
@@ -66,26 +67,48 @@ class ContinuousAggregateUpBuilder {
         const maxColumn = escapeIdentifier(config.column);
         return `MAX(${maxColumn}) as ${alias}`;
       }
+      case 'bucket': {
+        if (!config.column) {
+          throw new Error('Column is required for bucket aggregate');
+        }
+        const interval = escapeLiteral(this.options.bucket_interval);
+        const bucketColumn = escapeIdentifier(config.column);
+
+        return `time_bucket(${interval}, ${bucketColumn}) as ${alias}`;
+      }
       default:
         throw new Error(`Unsupported aggregate type: ${config.type}`);
     }
   }
 
   private generateSelect(): string {
-    const timeColumn = escapeIdentifier(this.options.time_column);
-    const interval = escapeLiteral(this.options.bucket_interval);
     const sourceName = escapeIdentifier(this.source);
 
-    const aggregates = Object.entries(this.options.aggregates || []).map(([, config]) => {
-      return this.generateAggregate(config);
-    });
+    const aggregates = Object.entries(this.options.aggregates || [])
+      .map(([, config]) => {
+        return config.type === AggregateType.Bucket ? false : this.generateAggregate(config);
+      })
+      .filter(Boolean) as string[];
+
+    const bucketAggregate = Object.entries(this.options.aggregates || []).find(
+      ([, config]) => config.type === AggregateType.Bucket,
+    );
+
+    const bucketColumnAlias = escapeIdentifier(bucketAggregate?.[1].column_alias || 'bucket');
+
+    const generatedBucketStr = bucketAggregate
+      ? this.generateAggregate(bucketAggregate[1])
+      : this.generateAggregate({
+          type: AggregateType.Bucket,
+          column: this.options.time_column,
+          column_alias: 'bucket',
+        });
 
     return `
       SELECT
-        time_bucket(${interval}, ${timeColumn}) as bucket,
-        ${aggregates.join(',\n        ')}
+        ${[generatedBucketStr, ...aggregates].join(',\n        ')}
       FROM ${sourceName}
-      GROUP BY bucket
+      GROUP BY ${bucketColumnAlias}
     `;
   }
 

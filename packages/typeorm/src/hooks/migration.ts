@@ -5,6 +5,7 @@ import { timescaleMethods } from '../repository/TimescaleRepository';
 import { CONTINUOUS_AGGREGATE_METADATA_KEY, ContinuousAggregateMetadata } from '../decorators/ContinuousAggregate';
 import { AGGREGATE_COLUMN_METADATA_KEY } from '../decorators/AggregateColumn';
 import { AggregateColumnOptions } from '@timescaledb/schemas';
+import { validateBucketColumn } from '../decorators/BucketColumn';
 
 const originalRunMigrations = DataSource.prototype.runMigrations;
 const originalUndoLastMigration = DataSource.prototype.undoLastMigration;
@@ -204,27 +205,32 @@ async function setupContinuousAggregates(dataSource: DataSource) {
 
     await validateAggregateColumns(dataSource);
 
-    // Try both the prototype and constructor for aggregate columns
     const aggregateColumns =
       // @ts-ignore
       Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target.prototype) ||
-      (Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target) as Record<
-        string,
-        AggregateColumnOptions
-      > as Record<string, AggregateColumnOptions>);
+      (Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target) as Record<string, AggregateColumnOptions>);
 
     if (!aggregateColumns) {
       throw new Error('No aggregates defined for continuous aggregate');
     }
 
+    // @ts-ignore
+    const bucketMetadata = validateBucketColumn(entity.target);
+
+    // @ts-ignore
     aggregateMetadata.options.aggregates = {
+      [bucketMetadata.propertyKey.toString()]: {
+        type: 'bucket',
+        column: bucketMetadata.source_column,
+        column_alias: bucketMetadata.propertyKey.toString(),
+      },
       ...aggregateMetadata.options.aggregates,
       ...Object.entries(aggregateColumns as Record<string, AggregateColumnOptions>).reduce(
         (acc: { [key: string]: AggregateColumnOptions }, [key, value]: [string, AggregateColumnOptions]) => {
           acc[key] = {
             type: value.type,
             column: value.column,
-            column_alias: value.column_alias,
+            column_alias: key,
           };
           return acc;
         },
