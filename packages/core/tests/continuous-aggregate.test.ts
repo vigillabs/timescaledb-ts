@@ -9,7 +9,6 @@ describe('ContinuousAggregate', () => {
         name: 'sum_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
         aggregates: {
           total_amount: {
             type: 'sum',
@@ -29,7 +28,6 @@ describe('ContinuousAggregate', () => {
         name: 'avg_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
         aggregates: {
           avg_amount: {
             type: 'avg',
@@ -49,7 +47,6 @@ describe('ContinuousAggregate', () => {
         name: 'minmax_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
         aggregates: {
           min_amount: {
             type: 'min',
@@ -75,7 +72,6 @@ describe('ContinuousAggregate', () => {
       name: 'test_view',
       bucket_interval: '1 hour',
       time_column: 'time',
-      materialized_only: true,
       aggregates: {
         count: {
           type: 'count',
@@ -100,7 +96,6 @@ describe('ContinuousAggregate', () => {
         name: 'no_policy_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
         aggregates: {
           count: {
             type: 'count',

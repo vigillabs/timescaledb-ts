@@ -22,7 +22,6 @@ export const CreateContinuousAggregateOptionsSchema = z
     bucket_interval: z.string(),
     time_column: z.string(),
     refresh_policy: RefreshPolicySchema.optional(),
-    materialized_only: z.boolean().optional().default(true),
     aggregates: z.record(AggregateColumnOptionsSchema).optional(),
   })
   .strict();

@@ -133,7 +133,6 @@ import { PageLoad } from './PageLoad';
   name: 'hourly_page_views',
   bucket_interval: '1 hour',
   time_column: 'time',
-  materialized_only: true,
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',
