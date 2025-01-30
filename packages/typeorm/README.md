@@ -116,7 +116,7 @@ console.log(stats);
 
 ### Creating a Continuous Aggregate
 
-Use the `@ContinuousAggregate` decorator to define materialized views that automatically maintain aggregates over time windows:
+Use the `@ContinuousAggregate` decorator to define materialized views that automatically maintain aggregates over time windows, plus the `@AggregateColumn` decorator to define the columns in the materialized view:
 
 See:
 
@@ -126,26 +126,12 @@ Usage:
 
 ```ts
 import { ViewColumn } from 'typeorm';
-import { ContinuousAggregate } from '@timescaledb/typeorm';
+import { ContinuousAggregate, AggregateColumn, BucketColumn } from '@timescaledb/typeorm';
 import { PageLoad } from './PageLoad';
 
 @ContinuousAggregate(PageLoad, {
   name: 'hourly_page_views',
   bucket_interval: '1 hour',
-  time_column: 'time',
-  materialized_only: true,
-  create_group_indexes: true,
-  aggregates: {
-    total_views: {
-      type: 'count',
-      column_alias: 'total_views',
-    },
-    unique_users: {
-      type: 'count_distinct',
-      column: 'user_agent',
-      column_alias: 'unique_users',
-    },
-  },
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',
@@ -153,13 +139,20 @@ import { PageLoad } from './PageLoad';
   },
 })
 export class HourlyPageViews {
-  @ViewColumn()
+  @BucketColumn({
+    source_column: 'time',
+  })
   bucket!: Date;
 
-  @ViewColumn()
+  @AggregateColumn({
+    type: 'count',
+  })
   total_views!: number;
 
-  @ViewColumn()
+  @AggregateColumn({
+    type: 'unique_count',
+    column: 'user_agent',
+  })
   unique_users!: number;
 }
 ```

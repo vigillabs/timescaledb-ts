@@ -1,24 +1,10 @@
-import { ViewColumn } from 'typeorm';
-import { ContinuousAggregate } from '@timescaledb/typeorm';
+import { ContinuousAggregate, AggregateColumn, BucketColumn } from '@timescaledb/typeorm';
 import { PageLoad } from './PageLoad';
+import { AggregateType } from '@timescaledb/schemas';
 
 @ContinuousAggregate(PageLoad, {
   name: 'hourly_page_views',
   bucket_interval: '1 hour',
-  time_column: 'time',
-  materialized_only: true,
-  create_group_indexes: true,
-  aggregates: {
-    total_views: {
-      type: 'count',
-      column_alias: 'total_views',
-    },
-    unique_users: {
-      type: 'count_distinct',
-      column: 'user_agent',
-      column_alias: 'unique_users',
-    },
-  },
   refresh_policy: {
     start_offset: '3 days',
     end_offset: '1 hour',
@@ -26,12 +12,19 @@ import { PageLoad } from './PageLoad';
   },
 })
 export class HourlyPageViews {
-  @ViewColumn()
+  @BucketColumn({
+    source_column: 'time',
+  })
   bucket!: Date;
 
-  @ViewColumn()
+  @AggregateColumn({
+    type: AggregateType.Count,
+  })
   total_views!: number;
 
-  @ViewColumn()
+  @AggregateColumn({
+    type: AggregateType.CountDistinct,
+    column: 'user_agent',
+  })
   unique_users!: number;
 }

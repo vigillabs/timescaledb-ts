@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { TimescaleDB } from '../src';
-import { CreateContinuousAggregateOptions } from '@timescaledb/schemas';
+import { CreateContinuousAggregateOptions, AggregateType } from '@timescaledb/schemas';
 
 describe('ContinuousAggregate', () => {
   describe('aggregate functions', () => {
@@ -9,11 +9,9 @@ describe('ContinuousAggregate', () => {
         name: 'sum_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           total_amount: {
-            type: 'sum',
+            type: AggregateType.Sum,
             column: 'amount',
             column_alias: 'total_amount',
           },
@@ -30,11 +28,9 @@ describe('ContinuousAggregate', () => {
         name: 'avg_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           avg_amount: {
-            type: 'avg',
+            type: AggregateType.Avg,
             column: 'amount',
             column_alias: 'avg_amount',
           },
@@ -51,16 +47,14 @@ describe('ContinuousAggregate', () => {
         name: 'minmax_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           min_amount: {
-            type: 'min',
+            type: AggregateType.Min,
             column: 'amount',
             column_alias: 'min_amount',
           },
           max_amount: {
-            type: 'max',
+            type: AggregateType.Max,
             column: 'amount',
             column_alias: 'max_amount',
           },
@@ -78,11 +72,9 @@ describe('ContinuousAggregate', () => {
       name: 'test_view',
       bucket_interval: '1 hour',
       time_column: 'time',
-      materialized_only: true,
-      create_group_indexes: true,
       aggregates: {
         count: {
-          type: 'count',
+          type: AggregateType.Count,
           column_alias: 'total_count',
         },
       },
@@ -104,11 +96,9 @@ describe('ContinuousAggregate', () => {
         name: 'no_policy_view',
         bucket_interval: '1 hour',
         time_column: 'time',
-        materialized_only: true,
-        create_group_indexes: true,
         aggregates: {
           count: {
-            type: 'count',
+            type: AggregateType.Count,
             column_alias: 'total_count',
           },
         },

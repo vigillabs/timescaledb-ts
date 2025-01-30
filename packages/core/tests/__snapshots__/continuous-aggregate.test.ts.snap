@@ -3,31 +3,31 @@
 exports[`ContinuousAggregate aggregate functions should create view with average aggregate 1`] = `
 "CREATE MATERIALIZED VIEW "avg_view" WITH (timescaledb.continuous) AS 
       SELECT
-        time_bucket('1 hour', "time") as bucket,
+        time_bucket('1 hour', "time") as "bucket",
         AVG("amount") as "avg_amount"
       FROM "source_table"
-      GROUP BY bucket
+      GROUP BY "bucket"
      WITH NO DATA;"
 `;
 
 exports[`ContinuousAggregate aggregate functions should create view with min/max aggregates 1`] = `
 "CREATE MATERIALIZED VIEW "minmax_view" WITH (timescaledb.continuous) AS 
       SELECT
-        time_bucket('1 hour', "time") as bucket,
+        time_bucket('1 hour', "time") as "bucket",
         MIN("amount") as "min_amount",
         MAX("amount") as "max_amount"
       FROM "source_table"
-      GROUP BY bucket
+      GROUP BY "bucket"
      WITH NO DATA;"
 `;
 
 exports[`ContinuousAggregate aggregate functions should create view with sum aggregate 1`] = `
 "CREATE MATERIALIZED VIEW "sum_view" WITH (timescaledb.continuous) AS 
       SELECT
-        time_bucket('1 hour', "time") as bucket,
+        time_bucket('1 hour', "time") as "bucket",
         SUM("amount") as "total_amount"
       FROM "source_table"
-      GROUP BY bucket
+      GROUP BY "bucket"
      WITH NO DATA;"
 `;
 

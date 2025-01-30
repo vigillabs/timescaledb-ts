@@ -36,7 +36,7 @@ describe('GET /api/hourly', () => {
     await AppDataSource.query(`CALL refresh_continuous_aggregate('hourly_page_views', null, null);`);
 
     // Wait for refresh to complete
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     const start = new Date(baseTime.getTime() - 4 * 3600000); // 4 hours ago
     const end = baseTime;
@@ -55,8 +55,8 @@ describe('GET /api/hourly', () => {
     expect(firstHour).toHaveProperty('unique_users');
 
     response.body.forEach((hour: any) => {
-      expect(hour.total_views).toBe('5'); // 5 views per hour
-      expect(hour.unique_users).toBe('5'); // 5 unique users per hour
+      expect(hour.total_views).toBe(5);
+      expect(hour.unique_users).toBe(5);
     });
   });
 });
