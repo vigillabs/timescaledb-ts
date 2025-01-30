@@ -1,7 +1,14 @@
 import { z } from 'zod';
 
-export const AggregateTypeSchema = z.enum(['count', 'count_distinct', 'sum', 'avg', 'min', 'max']);
-export type AggregateType = z.infer<typeof AggregateTypeSchema>;
+export enum AggregateType {
+  Count = 'count',
+  CountDistinct = 'count_distinct',
+  Sum = 'sum',
+  Avg = 'avg',
+  Min = 'min',
+  Max = 'max',
+}
+export const AggregateTypeSchema = z.nativeEnum(AggregateType);
 
 export const AggregateColumnOptionsSchema = z.object({
   type: AggregateTypeSchema,

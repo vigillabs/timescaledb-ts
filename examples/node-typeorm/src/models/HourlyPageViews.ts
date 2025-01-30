@@ -1,6 +1,7 @@
 import { ViewColumn } from 'typeorm';
 import { ContinuousAggregate, AggregateColumn } from '@timescaledb/typeorm';
 import { PageLoad } from './PageLoad';
+import { AggregateType } from '@timescaledb/schemas';
 
 @ContinuousAggregate(PageLoad, {
   name: 'hourly_page_views',
@@ -17,12 +18,12 @@ export class HourlyPageViews {
   bucket!: Date;
 
   @AggregateColumn({
-    type: 'count',
+    type: AggregateType.Count,
   })
   total_views!: number;
 
   @AggregateColumn({
-    type: 'count_distinct',
+    type: AggregateType.CountDistinct,
     column: 'user_agent',
   })
   unique_users!: number;

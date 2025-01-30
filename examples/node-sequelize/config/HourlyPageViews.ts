@@ -1,15 +1,16 @@
 import { TimescaleDB } from '@timescaledb/core';
+import { AggregateType } from '@timescaledb/schemas';
 
 export const HourlyPageViews = TimescaleDB.createContinuousAggregate('hourly_page_views', 'page_loads', {
   bucket_interval: '1 hour',
   time_column: 'time',
   aggregates: {
     total_views: {
-      type: 'count',
+      type: AggregateType.Count,
       column_alias: 'total_views',
     },
     unique_users: {
-      type: 'count_distinct',
+      type: AggregateType.CountDistinct,
       column: 'user_agent',
       column_alias: 'unique_users',
     },
