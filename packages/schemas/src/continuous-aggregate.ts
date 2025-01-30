@@ -3,12 +3,12 @@ import { z } from 'zod';
 export const AggregateTypeSchema = z.enum(['count', 'count_distinct', 'sum', 'avg', 'min', 'max']);
 export type AggregateType = z.infer<typeof AggregateTypeSchema>;
 
-export const AggregateConfigSchema = z.object({
+export const AggregateColumnOptionsSchema = z.object({
   type: AggregateTypeSchema,
   column: z.string().optional(),
-  column_alias: z.string(),
+  column_alias: z.string().optional(),
 });
-export type AggregateConfig = z.infer<typeof AggregateConfigSchema>;
+export type AggregateColumnOptions = z.infer<typeof AggregateColumnOptionsSchema>;
 
 export const RefreshPolicySchema = z.object({
   start_offset: z.string(),
@@ -24,7 +24,7 @@ export const CreateContinuousAggregateOptionsSchema = z
     refresh_policy: RefreshPolicySchema.optional(),
     materialized_only: z.boolean().optional().default(true),
     create_group_indexes: z.boolean().optional().default(true),
-    aggregates: z.record(AggregateConfigSchema).optional(),
+    aggregates: z.record(AggregateColumnOptionsSchema).optional(),
   })
   .strict();
 

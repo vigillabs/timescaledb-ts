@@ -55,8 +55,8 @@ describe('GET /api/hourly', () => {
     expect(firstHour).toHaveProperty('unique_users');
 
     response.body.forEach((hour: any) => {
-      expect(hour.total_views).toBe('5'); // 5 views per hour
-      expect(hour.unique_users).toBe('5'); // 5 unique users per hour
+      expect(hour.total_views).toBe(5);
+      expect(hour.unique_users).toBe(5);
     });
   });
 });

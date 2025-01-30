@@ -1,8 +1,10 @@
-import { DataSource } from 'typeorm';
+import { DataSource, getMetadataArgsStorage } from 'typeorm';
 import { TimescaleDB } from '@timescaledb/core';
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { timescaleMethods } from '../repository/TimescaleRepository';
 import { CONTINUOUS_AGGREGATE_METADATA_KEY, ContinuousAggregateMetadata } from '../decorators/ContinuousAggregate';
+import { AGGREGATE_COLUMN_METADATA_KEY } from '../decorators/AggregateColumn';
+import { AggregateColumnOptions } from '@timescaledb/schemas';
 
 const originalRunMigrations = DataSource.prototype.runMigrations;
 const originalUndoLastMigration = DataSource.prototype.undoLastMigration;
@@ -157,6 +159,29 @@ async function removeTimescaleObjects(dataSource: DataSource) {
   await removeHypertables(dataSource);
 }
 
+async function validateAggregateColumns(dataSource: DataSource) {
+  for (const entity of dataSource.entityMetadatas) {
+    // Try both the prototype and constructor
+    const aggregateColumns =
+      // @ts-ignore
+      Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target.prototype) ||
+      Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target);
+
+    if (aggregateColumns) {
+      const continuousAggregateMetadata = Reflect.getMetadata(CONTINUOUS_AGGREGATE_METADATA_KEY, entity.target);
+      if (!continuousAggregateMetadata) {
+        throw new Error(`Class ${entity.name} uses @AggregateColumn but is not decorated with @ContinuousAggregate`);
+      }
+
+      const { sourceModel } = continuousAggregateMetadata;
+      const sourceMetadata = getMetadataArgsStorage().tables.find((table) => table.target === sourceModel);
+      if (!sourceMetadata) {
+        throw new Error(`Source model for ${entity.name} is not a valid TypeORM entity`);
+      }
+    }
+  }
+}
+
 async function setupContinuousAggregates(dataSource: DataSource) {
   const entities = dataSource.entityMetadatas;
 
@@ -176,6 +201,36 @@ async function setupContinuousAggregates(dataSource: DataSource) {
 
     const hypertableCheck = await dataSource.query(sourceHypertable.inspect().build());
     if (!hypertableCheck[0].is_hypertable) continue;
+
+    await validateAggregateColumns(dataSource);
+
+    // Try both the prototype and constructor for aggregate columns
+    const aggregateColumns =
+      // @ts-ignore
+      Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target.prototype) ||
+      (Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target) as Record<
+        string,
+        AggregateColumnOptions
+      > as Record<string, AggregateColumnOptions>);
+
+    if (!aggregateColumns) {
+      throw new Error('No aggregates defined for continuous aggregate');
+    }
+
+    aggregateMetadata.options.aggregates = {
+      ...aggregateMetadata.options.aggregates,
+      ...Object.entries(aggregateColumns as Record<string, AggregateColumnOptions>).reduce(
+        (acc: { [key: string]: AggregateColumnOptions }, [key, value]: [string, AggregateColumnOptions]) => {
+          acc[key] = {
+            type: value.type,
+            column: value.column,
+            column_alias: value.column_alias,
+          };
+          return acc;
+        },
+        {},
+      ),
+    };
 
     const aggregate = TimescaleDB.createContinuousAggregate(
       entity.tableName,

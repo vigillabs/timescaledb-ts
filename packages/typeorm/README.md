@@ -126,7 +126,7 @@ Usage:
 
 ```ts
 import { ViewColumn } from 'typeorm';
-import { ContinuousAggregate, Aggregate } from '@timescaledb/typeorm';
+import { ContinuousAggregate, AggregateColumn } from '@timescaledb/typeorm';
 import { PageLoad } from './PageLoad';
 
 @ContinuousAggregate(PageLoad, {
@@ -145,12 +145,12 @@ export class HourlyPageViews {
   @ViewColumn()
   bucket!: Date;
 
-  @Aggregate({
+  @AggregateColumn({
     type: 'count',
   })
   total_views!: number;
 
-  @ViewColumn({
+  @@AggregateColumn({
     type: 'unique_count',
     column: 'user_agent',
   })

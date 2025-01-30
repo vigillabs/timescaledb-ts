@@ -1,4 +1,8 @@
-import { CreateContinuousAggregateOptions, CreateContinuousAggregateOptionsSchema } from '@timescaledb/schemas';
+import {
+  AggregateColumnOptions,
+  CreateContinuousAggregateOptions,
+  CreateContinuousAggregateOptionsSchema,
+} from '@timescaledb/schemas';
 import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
 
 class ContinuousAggregateInspectBuilder {
@@ -21,8 +25,8 @@ class ContinuousAggregateUpBuilder {
     private options: CreateContinuousAggregateOptions,
   ) {}
 
-  private generateAggregate(config: { type: string; column?: string; column_alias: string }): string {
-    const alias = escapeIdentifier(config.column_alias);
+  private generateAggregate(config: AggregateColumnOptions): string {
+    const alias = escapeIdentifier(config.column_alias!);
 
     switch (config.type) {
       case 'count':
