@@ -150,7 +150,7 @@ export class HourlyPageViews {
   })
   total_views!: number;
 
-  @@AggregateColumn({
+  @AggregateColumn({
     type: 'unique_count',
     column: 'user_agent',
   })
