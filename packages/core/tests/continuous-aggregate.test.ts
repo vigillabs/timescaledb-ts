@@ -30,7 +30,7 @@ describe('ContinuousAggregate', () => {
         time_column: 'time',
         aggregates: {
           avg_amount: {
-            type: 'avg',
+            type: AggregateType.Avg,
             column: 'amount',
             column_alias: 'avg_amount',
           },
