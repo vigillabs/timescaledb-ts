@@ -66,7 +66,7 @@ DataSource.prototype.synchronize = async function (dropBeforeSync: boolean = fal
 async function setupHypertables(dataSource: DataSource) {
   const entities = dataSource.entityMetadatas;
 
-  for (const entity of entities) {
+  for await (const entity of entities) {
     const options = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, entity.target);
 
     if (options) {
@@ -92,7 +92,7 @@ async function setupHypertables(dataSource: DataSource) {
 async function removeHypertables(dataSource: DataSource) {
   const entities = dataSource.entityMetadatas;
 
-  for (const entity of entities) {
+  for await (const entity of entities) {
     const options = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, entity.target);
 
     if (options) {
