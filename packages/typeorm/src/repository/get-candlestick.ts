@@ -20,12 +20,9 @@ export async function getCandlestick<T extends ObjectLiteral>(
   });
 
   const sql = candlestick.build();
+  const params = [options.config.bucket_interval || '1 hour', options.timeRange.start, options.timeRange.end];
 
-  const results = await this.query(sql, [
-    options.config.bucket_interval || '1 hour',
-    options.timeRange.start,
-    options.timeRange.end,
-  ]);
+  const results = await this.query(sql, params);
 
   return results.map((row: any) => ({
     bucket_time: new Date(row.bucket_time),

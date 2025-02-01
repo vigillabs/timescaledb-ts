@@ -1,5 +1,3 @@
-// packages/core/tests/candlestick.test.ts
-
 import { describe, it, expect } from '@jest/globals';
 import { TimescaleDB } from '../src';
 

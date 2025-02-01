@@ -1,91 +1,35 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Candlestick Aggregation should generate basic candlestick query 1`] = `
-"
-      WITH time_bucket_groups AS (
-        SELECT 
-          time_bucket($1::interval, "timestamp") as bucket_time,
-          first("price", "timestamp") as open,
-          last("price", "timestamp") as close,
-          max("price") as high,
-          min("price") as low,
-          first("timestamp", "timestamp") as open_time,
-          last("timestamp", "timestamp") as close_time,
-          "timestamp" as high_time_inner,
-          "timestamp" as low_time_inner
-          
-        FROM "stock_prices"
-        WHERE "timestamp" >= $2 AND "timestamp" <= $3
-        GROUP BY bucket_time
-      ),
-      time_bucket_with_extremes AS (
-        SELECT 
-          *,
-          first(high_time_inner, "price") as high_time,
-          first(low_time_inner, "price") as low_time
-        FROM time_bucket_groups
-        GROUP BY 
-          bucket_time, open, close, high, low, 
-          open_time, close_time
-          
-      )
-      SELECT 
-        bucket_time,
-        open,
-        high,
-        low,
-        close,
-        open_time,
-        high_time,
-        low_time,
-        close_time
-        
-      FROM time_bucket_with_extremes
-      ORDER BY bucket_time ASC
-    "
+"SELECT
+  time_bucket($1::interval, "timestamp") as bucket_time,
+  open(candlestick_agg("timestamp", "price")) as open,
+  high(candlestick_agg("timestamp", "price")) as high,
+  low(candlestick_agg("timestamp", "price")) as low,
+  close(candlestick_agg("timestamp", "price")) as close,
+  open_time(candlestick_agg("timestamp", "price")) as open_time,
+  high_time(candlestick_agg("timestamp", "price")) as high_time,
+  low_time(candlestick_agg("timestamp", "price")) as low_time,
+  close_time(candlestick_agg("timestamp", "price")) as close_time
+FROM "stock_prices"
+WHERE "timestamp" >= $2 AND "timestamp" <= $3
+GROUP BY bucket_time
+ORDER BY bucket_time ASC;"
 `;
 
 exports[`Candlestick Aggregation should properly escape identifiers 1`] = `
-"
-      WITH time_bucket_groups AS (
-        SELECT 
-          time_bucket($1::interval, "time""stamp") as bucket_time,
-          first("price""value", "time""stamp") as open,
-          last("price""value", "time""stamp") as close,
-          max("price""value") as high,
-          min("price""value") as low,
-          first("time""stamp", "time""stamp") as open_time,
-          last("time""stamp", "time""stamp") as close_time,
-          "time""stamp" as high_time_inner,
-          "time""stamp" as low_time_inner
-          
-        FROM "stock_prices"
-        WHERE "time""stamp" >= $2 AND "time""stamp" <= $3
-        GROUP BY bucket_time
-      ),
-      time_bucket_with_extremes AS (
-        SELECT 
-          *,
-          first(high_time_inner, "price""value") as high_time,
-          first(low_time_inner, "price""value") as low_time
-        FROM time_bucket_groups
-        GROUP BY 
-          bucket_time, open, close, high, low, 
-          open_time, close_time
-          
-      )
-      SELECT 
-        bucket_time,
-        open,
-        high,
-        low,
-        close,
-        open_time,
-        high_time,
-        low_time,
-        close_time
-        
-      FROM time_bucket_with_extremes
-      ORDER BY bucket_time ASC
-    "
+"SELECT
+  time_bucket($1::interval, "time""stamp") as bucket_time,
+  open(candlestick_agg("time""stamp", "price""value")) as open,
+  high(candlestick_agg("time""stamp", "price""value")) as high,
+  low(candlestick_agg("time""stamp", "price""value")) as low,
+  close(candlestick_agg("time""stamp", "price""value")) as close,
+  open_time(candlestick_agg("time""stamp", "price""value")) as open_time,
+  high_time(candlestick_agg("time""stamp", "price""value")) as high_time,
+  low_time(candlestick_agg("time""stamp", "price""value")) as low_time,
+  close_time(candlestick_agg("time""stamp", "price""value")) as close_time
+FROM "stock_prices"
+WHERE "time""stamp" >= $2 AND "time""stamp" <= $3
+GROUP BY bucket_time
+ORDER BY bucket_time ASC;"
 `;

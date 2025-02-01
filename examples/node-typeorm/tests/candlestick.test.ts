@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { TimescaleRepository } from '@timescaledb/typeorm/repository/TimescaleRepository';
-import { describe, it, expect, beforeEach } from '@jest/globals';
+import { describe, it, expect } from '@jest/globals';
 import { AppDataSource } from '../src/data-source';
 import { StockPrice } from '../src/models/StockPrice';
 import { faker } from '@faker-js/faker';
@@ -9,6 +9,10 @@ describe('getCandlestick', () => {
   beforeEach(async () => {
     const repository = AppDataSource.getRepository(StockPrice);
     await repository.clear();
+  });
+
+  afterAll(async () => {
+    await AppDataSource.destroy();
   });
 
   it('should generate candlestick data for a given time range', async () => {
@@ -48,7 +52,6 @@ describe('getCandlestick', () => {
 
     expect(candlesticks).toHaveLength(3);
 
-    // Test structure of first candlestick
     const firstCandle = candlesticks[0];
     expect(firstCandle).toHaveProperty('bucket_time');
     expect(firstCandle).toHaveProperty('open');
@@ -58,7 +61,6 @@ describe('getCandlestick', () => {
     expect(firstCandle).toHaveProperty('volume');
     expect(firstCandle).toHaveProperty('vwap');
 
-    // Test logical values
     expect(firstCandle.high).toBeGreaterThanOrEqual(firstCandle.low);
     expect(firstCandle.volume).toBeGreaterThan(0);
   });
