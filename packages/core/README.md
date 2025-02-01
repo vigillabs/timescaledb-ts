@@ -136,6 +136,37 @@ const { sql, params } = hypertable
   .build();
 ```
 
+#### Creating Candlestick Aggregates
+
+```typescript
+const candlestick = TimescaleDB.createCandlestickAggregate('stock_prices', {
+  time_column: 'timestamp',
+  price_column: 'price',
+  volume_column: 'volume', // optional
+  bucket_interval: '1 hour', // defaults to '1 hour'
+});
+
+// Generate SQL
+const sql = candlestick.build();
+
+// Execute with parameters
+const params = [
+  '1 hour', // bucket interval
+  new Date('2025-01-01'), // start time
+  new Date('2025-01-02'), // end time
+];
+
+// Returns: bucket_time, open, high, low, close, volume, vwap, etc.
+const results = await query(sql, params);
+```
+
+The candlestick builder generates SQL that returns:
+
+- Bucket timestamps (`bucket_time`)
+- OHLC prices (`open`, `high`, `low`, `close`)
+- OHLC timestamps (`open_time`, `high_time`, `low_time`, `close_time`)
+- Volume data (`volume`, `vwap`) when `volume_column` is provided
+
 ## Examples
 
 Check out our example projects:
