@@ -1,4 +1,5 @@
 import {
+  CandlestickAggregateOptions,
   CreateContinuousAggregateOptions,
   CreateExtensionOptions,
   CreateHypertableOptions,
@@ -6,6 +7,7 @@ import {
 import { Hypertable } from './hypertable';
 import { Extension } from './extension';
 import { ContinuousAggregate } from './continuous-aggregate';
+import { CandlestickAggregateBuilder } from './candlestick';
 
 export const name = '@timescaledb/core';
 
@@ -30,6 +32,13 @@ export class TimescaleDB {
     options: Omit<CreateContinuousAggregateOptions, 'name'>,
   ): ContinuousAggregate {
     return new ContinuousAggregate(name, source, { ...options, name });
+  }
+
+  public static createCandlestickAggregate(
+    tableName: string,
+    options: CandlestickAggregateOptions,
+  ): CandlestickAggregateBuilder {
+    return new CandlestickAggregateBuilder(tableName, options);
   }
 }
 

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { AppDataSource } from '../data-source';
 import { PageLoad } from '../models/PageLoad';
 import { HourlyPageViews } from '../models/HourlyPageViews';
+import { StockPrice } from '../models/StockPrice';
 
 const router = Router();
 
@@ -76,6 +77,32 @@ router.get('/hourly', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get hourly stats' });
+  }
+});
+
+router.get('/candlestick', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+    // TODO - https://github.com/timescale/timescaledb-ts/issues/10
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const symbol = req.query.symbol as string;
+
+    const repository = AppDataSource.getRepository(StockPrice);
+    const candlesticks = await repository.getCandlesticks({
+      timeRange: { start, end },
+      config: {
+        time_column: 'timestamp',
+        price_column: 'price',
+        volume_column: 'volume',
+        bucket_interval: '1 hour',
+      },
+    });
+
+    res.json(candlesticks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get candlestick data' });
   }
 });
 

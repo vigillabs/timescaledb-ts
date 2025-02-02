@@ -5,3 +5,4 @@ export * from './by-range';
 export * from './extension';
 export * from './time-bucket';
 export * from './continuous-aggregate';
+export * from './candlestick';

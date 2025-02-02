@@ -112,6 +112,12 @@ console.log(stats);
 // }
 ```
 
+### `getCandlesticks`
+
+See:
+
+- [Candlestick 👇](#Candlesticks)
+
 ## Continuous Aggregates
 
 ### Creating a Continuous Aggregate
@@ -176,12 +182,86 @@ const hourlyStats = await AppDataSource.getRepository(HourlyPageViews)
   .getMany();
 ```
 
+## Candlesticks
+
+Use a Hypertable to define a time-series table, then use the `getCandlesticks` method on the repository to query candlestick data:
+
+See:
+
+- https://docs.timescale.com/api/latest/hyperfunctions/financial-analysis/candlestick_agg/
+
+### Defining a Candlestick Entity
+
+```typescript
+import { Entity } from 'typeorm';
+import { Hypertable } from '@timescaledb/typeorm';
+
+@Entity('stock_prices')
+@Hypertable({
+  by_range: {
+    column_name: 'timestamp',
+  },
+})
+export class StockPrice {
+  @PrimaryColumn({ type: 'varchar' })
+  tickerSymbol: string;
+
+  @PrimaryColumn({ type: 'timestamp' })
+  timestamp: Date;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  price: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  volume: number;
+}
+```
+
+### Querying Candlestick Data
+
+Use the appended `getCandlesticks` method on the repository to query candlestick data:
+
+```typescript
+const repository = AppDataSource.getRepository(StockPrice);
+const candlesticks = await repository.getCandlesticks({
+  timeRange: {
+    start: new Date('2025-01-01'),
+    end: new Date('2025-01-02'),
+  },
+  config: {
+    time_column: 'timestamp',
+    price_column: 'price',
+    volume_column: 'volume', // optional
+    bucket_interval: '1 hour', // defaults to '1 hour'
+  },
+});
+
+console.log(candlesticks);
+// Output:
+// [
+//   {
+//     bucket_time: "2025-01-01T00:00:00.000Z",
+//     open: 185.25,
+//     high: 186.64,
+//     low: 183.34,
+//     close: 184.87,
+//     open_time: "2025-01-01T00:02:15.000Z",
+//     high_time: "2025-01-01T00:45:12.000Z",
+//     low_time: "2025-01-01T00:15:33.000Z",
+//     close_time: "2025-01-01T00:59:45.000Z",
+//     volume: 2589100,
+//     vwap: 184.95
+//   },
+//   ...
+// ]
+```
+
 ## Migrations
 
 To hook into the TypeORM migration process, import the library at the top of your `data-source` file:
 
 ```typescript
-import '@timescaledb/typeorm'; // This should be the first import in your file
+import '@timescaledb/typeorm'; // This should be the first import in your file to hook into the TypeORM migration process
 
 import { DataSource } from 'typeorm';
 import { PageLoad, HourlyPageViews } from './models';
@@ -191,7 +271,7 @@ export const AppDataSource = new DataSource({
   url: process.env.DATABASE_URL,
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  entities: [PageLoad, HourlyPageViews],
+  entities: [PageLoad, HourlyPageViews, StockPrice], // <-- Add your entities here
   migrations: ['migrations/*.ts'],
 });
 ```
