@@ -32,7 +32,7 @@ If you are looking to setup this project locally, you can follow the instruction
 | [Time Bucket](https://docs.timescale.com/api/latest/hyperfunctions/time_bucket/)                                                     | ✅   | ✅      | ✅ Manual (via Core) |
 | [Candlestick Aggregates](https://docs.timescale.com/api/latest/hyperfunctions/financial-analysis/candlestick_agg/)                   | ✅   | ✅      | ✅ Manual (via Core) |
 | [Stats Aggregates](https://docs.timescale.com/api/latest/hyperfunctions/statistical-and-regression-analysis/stats_agg-one-variable/) | ❌   | ❌      | ❌                   |
-| [Percentile Spproximation](https://docs.timescale.com/api/latest/hyperfunctions/percentile-approximation/uddsketch/)                 | ❌   | ❌      | ❌                   |
+| [Percentile Approximation](https://docs.timescale.com/api/latest/hyperfunctions/percentile-approximation/uddsketch/)                 | ❌   | ❌      | ❌                   |
 | **Info Views**                                                                                                                       |      |         |                      |
 | [Chunks](https://docs.timescale.com/api/latest/hypertable/show_chunks/)                                                              | ❌   | ❌      | ❌                   |
 | [User Defined Actions](https://docs.timescale.com/api/latest/actions/)                                                               | ❌   | ❌      | ❌                   |
