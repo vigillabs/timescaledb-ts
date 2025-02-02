@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import PageLoad from '../models/PageLoad';
-import { getPageViewStats, getCompressionStats } from '../services/timescale';
+import { getPageViewStats, getCompressionStats, getCandlestickData } from '../services/timescale';
 import HourlyPageView from '../models/HourlyPageView';
 import { Op } from 'sequelize';
 
@@ -60,6 +60,20 @@ router.get('/hourly', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get hourly stats' });
+  }
+});
+
+router.get('/candlestick', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+    const interval = req.query.interval as string;
+
+    const candlesticks = await getCandlestickData({ start, end, interval });
+    res.json(candlesticks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get candlestick data' });
   }
 });
 
