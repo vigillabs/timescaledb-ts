@@ -1,13 +1,13 @@
 import { Repository, ObjectLiteral } from 'typeorm';
-import { CandlestickResult, CompressionStats, GetCandlestickOptions, TimeBucketOptions } from '@timescaledb/schemas';
+import { CandlesticksResult, CompressionStats, GetCandlesticksOptions, TimeBucketOptions } from '@timescaledb/schemas';
 import { getCompressionStats } from './get-compression-stats';
 import { getTimeBucket } from './get-time-bucket';
-import { getCandlestick } from './get-candlestick';
+import { getCandlesticks } from './get-candlesticks';
 
-type GetCandlestick = <T extends ObjectLiteral>(
+type GetCandlesticks = <T extends ObjectLiteral>(
   this: Repository<T>,
-  options: GetCandlestickOptions,
-) => Promise<CandlestickResult[]>;
+  options: GetCandlesticksOptions,
+) => Promise<CandlesticksResult[]>;
 
 type GetCompressionStats = () => Promise<CompressionStats>;
 
@@ -23,13 +23,13 @@ type GetTimeBucket = <T extends ObjectLiteral>(
 export interface TimescaleRepository<Entity extends ObjectLiteral> extends Repository<Entity> {
   getCompressionStats: GetCompressionStats;
   getTimeBucket: GetTimeBucket;
-  getCandlestick: GetCandlestick;
+  getCandlesticks: GetCandlesticks;
 }
 
 export const timescaleMethods = {
   getCompressionStats,
   getTimeBucket,
-  getCandlestick,
+  getCandlesticks,
 };
 
 // Module augmentation for TypeORM
@@ -38,6 +38,6 @@ declare module 'typeorm' {
   interface Repository<Entity extends ObjectLiteral> {
     getCompressionStats: GetCompressionStats;
     getTimeBucket: GetTimeBucket;
-    getCandlestick: GetCandlestick;
+    getCandlesticks: GetCandlesticks;
   }
 }

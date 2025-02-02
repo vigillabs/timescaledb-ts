@@ -10,7 +10,7 @@ export const CandlestickAggregateOptionsSchema = z.object({
 
 export type CandlestickAggregateOptions = z.infer<typeof CandlestickAggregateOptionsSchema>;
 
-export const CandlestickResultSchema = z.object({
+export const CandlesticksResultSchema = z.object({
   bucket_time: z.date(),
   open: z.number(),
   high: z.number(),
@@ -24,11 +24,11 @@ export const CandlestickResultSchema = z.object({
   close_time: z.date(),
 });
 
-export type CandlestickResult = z.infer<typeof CandlestickResultSchema>;
+export type CandlesticksResult = z.infer<typeof CandlesticksResultSchema>;
 
-export type GetCandlestickOptions = z.infer<typeof GetCandlestickOptionsSchema>;
+export type GetCandlesticksOptions = z.infer<typeof GetCandlesticksOptionsSchema>;
 
-export const GetCandlestickOptionsSchema = z.object({
+export const GetCandlesticksOptionsSchema = z.object({
   timeRange: TimeRangeSchema,
   config: CandlestickAggregateOptionsSchema,
 });

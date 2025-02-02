@@ -112,7 +112,7 @@ console.log(stats);
 // }
 ```
 
-### `getCandlestick`
+### `getCandlesticks`
 
 See:
 
@@ -184,7 +184,7 @@ const hourlyStats = await AppDataSource.getRepository(HourlyPageViews)
 
 ## Candlesticks
 
-Use a Hypertable to define a time-series table, then use the `getCandlestick` method on the repository to query candlestick data:
+Use a Hypertable to define a time-series table, then use the `getCandlesticks` method on the repository to query candlestick data:
 
 See:
 
@@ -219,11 +219,11 @@ export class StockPrice {
 
 ### Querying Candlestick Data
 
-Use the appended `getCandlestick` method on the repository to query candlestick data:
+Use the appended `getCandlesticks` method on the repository to query candlestick data:
 
 ```typescript
 const repository = AppDataSource.getRepository(StockPrice);
-const candlesticks = await repository.getCandlestick({
+const candlesticks = await repository.getCandlesticks({
   timeRange: {
     start: new Date('2025-01-01'),
     end: new Date('2025-01-02'),

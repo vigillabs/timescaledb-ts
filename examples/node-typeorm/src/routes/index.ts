@@ -89,7 +89,7 @@ router.get('/candlestick', async (req, res) => {
     const symbol = req.query.symbol as string;
 
     const repository = AppDataSource.getRepository(StockPrice);
-    const candlesticks = await repository.getCandlestick({
+    const candlesticks = await repository.getCandlesticks({
       timeRange: { start, end },
       config: {
         time_column: 'timestamp',

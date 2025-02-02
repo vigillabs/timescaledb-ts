@@ -1,12 +1,12 @@
 import { Repository, ObjectLiteral } from 'typeorm';
 import { TimescaleDB } from '@timescaledb/core';
-import { GetCandlestickOptions, CandlestickResult } from '@timescaledb/schemas';
+import { GetCandlesticksOptions, CandlesticksResult } from '@timescaledb/schemas';
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 
-export async function getCandlestick<T extends ObjectLiteral>(
+export async function getCandlesticks<T extends ObjectLiteral>(
   this: Repository<T>,
-  options: GetCandlestickOptions,
-): Promise<CandlestickResult[]> {
+  options: GetCandlesticksOptions,
+): Promise<CandlesticksResult[]> {
   const target = this.target as Function;
   const hypertableOptions = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, target);
 
