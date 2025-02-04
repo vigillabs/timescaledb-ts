@@ -1,4 +1,3 @@
-// packages/core/src/time-bucket.ts
 import { MetricConfig, TimeBucketConfig, TimeRange, WhereClause } from '@timescaledb/schemas';
 import { buildWhereClause, escapeIdentifier } from '@timescaledb/utils';
 
@@ -41,8 +40,8 @@ export class TimeBucketBuilder {
       return { sql: '', params: [] };
     }
 
-    // Pass the current parameter offset to buildWhereClause
     const { sql, params } = buildWhereClause(where, paramOffset);
+
     return { sql: ` AND ${sql}`, params };
   }
 
@@ -64,7 +63,6 @@ export class TimeBucketBuilder {
     this.params.push(this.interval);
     const intervalParam = '$1';
 
-    // Next two parameters are for the time range
     this.params.push(range.start, range.end);
 
     this.statements.push(`WITH time_buckets AS (`);
@@ -78,7 +76,6 @@ export class TimeBucketBuilder {
     const whereStatement = `  WHERE ${timeColumn} >= $2 AND ${timeColumn} <= $3${whereClause.sql}`;
     this.statements.push(whereStatement);
 
-    // Add where clause parameters
     this.params.push(...whereClause.params);
 
     this.statements.push(`  GROUP BY interval`);

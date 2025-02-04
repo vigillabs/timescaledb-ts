@@ -22,6 +22,7 @@ export class CandlestickAggregateBuilder {
     }
 
     const { sql, params } = buildWhereClause(where, paramOffset);
+
     return { sql: ` AND ${sql}`, params };
   }
 
