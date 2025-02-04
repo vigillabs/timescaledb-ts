@@ -3,6 +3,7 @@ import PageLoad from '../models/PageLoad';
 import { getPageViewStats, getCompressionStats, getCandlestickData } from '../services/timescale';
 import HourlyPageView from '../models/HourlyPageView';
 import { Op } from 'sequelize';
+import { WhereClauseSchema } from '@timescaledb/schemas';
 
 const router = Router();
 
@@ -23,8 +24,16 @@ router.get('/stats', async (req, res) => {
   try {
     const start = new Date(req.query.start as string);
     const end = new Date(req.query.end as string);
+    const where = req.query.where as string;
+    const whereClause = where ? WhereClauseSchema.parse(JSON.parse(where)) : undefined;
 
-    const stats = await getPageViewStats({ start, end });
+    const stats = await getPageViewStats({
+      where: whereClause,
+      range: {
+        start,
+        end,
+      },
+    });
     res.json(stats);
   } catch (error) {
     console.error(error);
@@ -69,7 +78,11 @@ router.get('/candlestick', async (req, res) => {
     const end = new Date(req.query.end as string);
     const interval = req.query.interval as string;
 
-    const candlesticks = await getCandlestickData({ start, end, interval });
+    const where = req.query.where as string;
+    const whereClause = where ? WhereClauseSchema.parse(JSON.parse(where)) : undefined;
+
+    const candlesticks = await getCandlestickData({ start, end, interval, where: whereClause });
+
     res.json(candlesticks);
   } catch (error) {
     console.error(error);
