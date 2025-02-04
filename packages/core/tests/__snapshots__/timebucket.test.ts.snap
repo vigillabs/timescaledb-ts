@@ -215,3 +215,51 @@ SELECT
 FROM time_buckets;",
 }
 `;
+
+exports[`TimeBucket where clause should generate query with comparison operator 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+    25,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3 AND "temperature" > $4
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket where clause should generate query with simple where condition 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+    "123",
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3 AND "user_id" = $4
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;

@@ -16,12 +16,12 @@ export class CandlestickAggregateBuilder {
     this.options = CandlestickAggregateOptionsSchema.parse(options);
   }
 
-  private buildWhere(where?: WhereClause): { sql: string; params: any[] } {
+  private buildWhere(where: WhereClause, paramOffset = 1): { sql: string; params: any[] } {
     if (!where) {
       return { sql: '', params: [] };
     }
 
-    const { sql, params } = buildWhereClause(where);
+    const { sql, params } = buildWhereClause(where, paramOffset);
     return { sql: ` AND ${sql}`, params };
   }
 
@@ -32,7 +32,7 @@ export class CandlestickAggregateBuilder {
     const volumeColumn = this.options.volume_column ? escapeIdentifier(this.options.volume_column) : null;
     const interval = '$1::interval';
 
-    this.statements = []; // Reset statements array
+    this.statements = [];
 
     this.statements.push(`SELECT`);
     this.statements.push(`  time_bucket(${interval}, ${timeColumn}) as bucket_time,`);
@@ -67,14 +67,24 @@ export class CandlestickAggregateBuilder {
     }
 
     this.statements.push(`FROM ${tableName}`);
-    const whereClause = this.buildWhere(where);
-    const whereStatement = `WHERE ${timeColumn} >= $2 AND ${timeColumn} <= $3${whereClause.sql}`;
-    this.statements.push(whereStatement);
+
+    const params: (string | Date)[] = [this.options.bucket_interval || '1 hour'];
+    if (range) {
+      params.push(range.start, range.end);
+    }
+
+    const whereClause = this.buildWhere(where as WhereClause, params.length + 1);
+    const timeRangeWhere = range ? `WHERE ${timeColumn} >= $2 AND ${timeColumn} <= $3` : '';
+    const fullWhere = timeRangeWhere + whereClause.sql;
+
+    if (fullWhere) {
+      this.statements.push(fullWhere);
+    }
+
+    params.push(...whereClause.params);
 
     this.statements.push(`GROUP BY bucket_time`);
     this.statements.push(`ORDER BY bucket_time ASC;`);
-
-    const params = [this.options.bucket_interval || '1 hour', range?.start, range?.end, ...whereClause.params];
 
     return {
       sql: this.statements.join('\n'),

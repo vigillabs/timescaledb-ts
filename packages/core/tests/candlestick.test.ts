@@ -43,10 +43,8 @@ describe('Candlestick Aggregation', () => {
         volume: { '>': 1000000 },
       };
 
-      const { sql, params } = builder.build({ range, where });
-
+      const sql = builder.build({ range, where });
       expect(sql).toMatchSnapshot();
-      expect(params).toHaveLength(5);
     });
 
     it('should work without where clause', () => {
@@ -61,10 +59,8 @@ describe('Candlestick Aggregation', () => {
         end: new Date('2025-01-02T00:00:00Z'),
       };
 
-      const { sql, params } = builder.build({ range });
-
+      const sql = builder.build({ range });
       expect(sql).toMatchSnapshot();
-      expect(params).toHaveLength(3);
     });
   });
 });

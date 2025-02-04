@@ -1,10 +1,10 @@
 import { escapeIdentifier } from './sql';
 import { WhereClause } from '@timescaledb/schemas';
 
-export function buildWhereClause(where: WhereClause): { sql: string; params: any[] } {
+export function buildWhereClause(where: WhereClause, startParamIndex: number = 1): { sql: string; params: any[] } {
   const conditions: string[] = [];
   const params: any[] = [];
-  let paramIndex = 1;
+  let paramIndex = startParamIndex;
 
   for (const [column, condition] of Object.entries(where)) {
     const escapedColumn = escapeIdentifier(column);

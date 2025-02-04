@@ -37,6 +37,7 @@ export async function getTimeBucket<T extends ObjectLiteral>(
       start: options.timeRange.start,
       end: options.timeRange.end,
     },
+    where: options.where,
   });
   const results = await this.query(sql, params);
 

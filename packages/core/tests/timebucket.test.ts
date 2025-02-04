@@ -108,6 +108,54 @@ describe('TimeBucket', () => {
     );
   });
 
+  describe('where clause', () => {
+    it('should generate query with simple where condition', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'count',
+              alias: 'total_count',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+          where: {
+            user_id: '123',
+          },
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+      expect(params).toHaveLength(4); // interval, start, end, user_id
+    });
+
+    it('should generate query with comparison operator', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'count',
+              alias: 'total_count',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+          where: {
+            temperature: { '>': 25 },
+          },
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+      expect(params).toHaveLength(4); // interval, start, end, temperature value
+    });
+  });
+
   describe('error handling', () => {
     it('should throw error for invalid metric type', () => {
       const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);

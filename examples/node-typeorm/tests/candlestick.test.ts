@@ -17,6 +17,7 @@ describe('GET /api/candlestick', () => {
     const repository = AppDataSource.getRepository(StockPrice);
     const baseTime = new Date('2025-01-01T00:00:00Z');
     const symbol = 'BTC';
+    const otherSymbol = 'OTHER';
 
     const testData = [
       { symbol, timestamp: new Date(baseTime.getTime() + 5 * 60000), price: 102000, volume: 1.5 }, // Opening price
@@ -28,6 +29,8 @@ describe('GET /api/candlestick', () => {
       { symbol, timestamp: new Date(baseTime.getTime() + 75 * 60000), price: 105000, volume: 2.5 },
       { symbol, timestamp: new Date(baseTime.getTime() + 85 * 60000), price: 104000, volume: 1.7 },
       { symbol, timestamp: new Date(baseTime.getTime() + 115 * 60000), price: 104500, volume: 1.9 },
+
+      { symbol: otherSymbol, timestamp: new Date(baseTime.getTime() + 125 * 60000), price: 420, volume: 1.2 },
     ];
 
     await Promise.all(testData.map((data) => repository.save(data)));
@@ -35,11 +38,13 @@ describe('GET /api/candlestick', () => {
     const start = baseTime;
     const end = new Date(baseTime.getTime() + 3 * 3600000); // 3 hours later
 
-    const response = await request().get('/api/candlestick').query({
-      start: start.toISOString(),
-      end: end.toISOString(),
-      symbol: symbol,
-    });
+    const response = await request()
+      .get('/api/candlestick')
+      .query({
+        start: start.toISOString(),
+        end: end.toISOString(),
+        where: JSON.stringify({ symbol }),
+      });
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveLength(2);

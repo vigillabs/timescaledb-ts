@@ -1,3 +1,4 @@
+// packages/core/src/time-bucket.ts
 import { MetricConfig, TimeBucketConfig, TimeRange, WhereClause } from '@timescaledb/schemas';
 import { buildWhereClause, escapeIdentifier } from '@timescaledb/utils';
 
@@ -8,7 +9,6 @@ export class TimeBucketBuilder {
   private timeColumn: string;
   private interval: string;
   private metrics: MetricConfig[];
-  private paramIndex: number = 1;
   private params: any[] = [];
 
   constructor(tableName: string, timeColumn: string, config: TimeBucketConfig) {
@@ -16,11 +16,6 @@ export class TimeBucketBuilder {
     this.timeColumn = timeColumn;
     this.interval = config.interval;
     this.metrics = config.metrics;
-  }
-
-  private addParam(value: any): string {
-    this.params.push(value);
-    return `$${this.paramIndex++}`;
   }
 
   private buildMetrics(): void {
@@ -41,12 +36,13 @@ export class TimeBucketBuilder {
     });
   }
 
-  private buildWhere(where?: WhereClause): { sql: string; params: any[] } {
+  private buildWhere(where: WhereClause, paramOffset = 1): { sql: string; params: any[] } {
     if (!where) {
       return { sql: '', params: [] };
     }
 
-    const { sql, params } = buildWhereClause(where);
+    // Pass the current parameter offset to buildWhereClause
+    const { sql, params } = buildWhereClause(where, paramOffset);
     return { sql: ` AND ${sql}`, params };
   }
 
@@ -55,7 +51,6 @@ export class TimeBucketBuilder {
       throw new Error('TimeRange is required');
     }
 
-    this.paramIndex = 1;
     this.params = [];
     this.statements = [];
     this.metricStatements = [];
@@ -64,7 +59,13 @@ export class TimeBucketBuilder {
 
     const tableName = escapeIdentifier(this.tableName);
     const timeColumn = escapeIdentifier(this.timeColumn);
-    const intervalParam = this.addParam(this.interval);
+
+    // First parameter is always the interval
+    this.params.push(this.interval);
+    const intervalParam = '$1';
+
+    // Next two parameters are for the time range
+    this.params.push(range.start, range.end);
 
     this.statements.push(`WITH time_buckets AS (`);
     this.statements.push(`  SELECT`);
@@ -72,12 +73,13 @@ export class TimeBucketBuilder {
     this.statements.push(`    ${this.metricStatements.join(',\n    ')}`);
     this.statements.push(`  FROM ${tableName}`);
 
-    // Build complete WHERE clause
-    const timeStart = this.addParam(range.start);
-    const timeEnd = this.addParam(range.end);
-    const whereClause = this.buildWhere(where);
-    const whereStatement = `  WHERE ${timeColumn} >= ${timeStart} AND ${timeColumn} <= ${timeEnd}${whereClause.sql}`;
+    // Build WHERE clause starting from parameter index 4 (after interval and time range)
+    const whereClause = this.buildWhere(where as WhereClause, 4);
+    const whereStatement = `  WHERE ${timeColumn} >= $2 AND ${timeColumn} <= $3${whereClause.sql}`;
     this.statements.push(whereStatement);
+
+    // Add where clause parameters
+    this.params.push(...whereClause.params);
 
     this.statements.push(`  GROUP BY interval`);
     this.statements.push(`  ORDER BY interval DESC`);
@@ -93,9 +95,6 @@ export class TimeBucketBuilder {
 
     this.statements.push(metricAliases.join(',\n'));
     this.statements.push(`FROM time_buckets;`);
-
-    // Add where clause parameters
-    this.params.push(...whereClause.params);
 
     return {
       sql: this.statements.join('\n'),

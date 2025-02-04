@@ -21,6 +21,7 @@ export async function getCandlesticks<T extends ObjectLiteral>(
 
   const { sql, params } = candlestick.build({
     range: options.timeRange,
+    where: options.where,
   });
 
   const results = await this.query(sql, params);
