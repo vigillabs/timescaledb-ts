@@ -18,6 +18,10 @@ If you are looking to setup this project locally, you can follow the instruction
 - [Node Sequelize Example](./examples/node-sequelize/README.md) - Using TimescaleDB with Node.js and [Sequelize](https://sequelize.org/)
 - [Node TypeORM Example](./examples/node-typeorm/README.md) - Using TimescaleDB with Node.js and [TypeORM](https://typeorm.io/)
 
+## Guides
+
+- [Getting Started](./docs/guides/getting-started.md) - A guide to getting started with TimescaleDB and this library.
+
 ## Feature Compatibility
 
 | Feature                                                                                                                              | Core | TypeORM | Sequelize            |
