@@ -17,3 +17,7 @@ Once you have cloned the repo, you can use `pnpm <command>` to manage the monore
 ## Release
 
 Checkout the [RELEASE.md](./RELEASE.md) file for information on how to release a new version of the packages.
+
+## Testing
+
+Checkout the [TESTING.md](./TESTING.md) file for information on how to run the tests.
