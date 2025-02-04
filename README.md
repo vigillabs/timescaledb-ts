@@ -62,11 +62,11 @@ Then you can use the `@Hypertable` decorator to define your hypertables:
 import { Entity, PrimaryColumn } from 'typeorm';
 + import { Hypertable } from '@timescaledb/typeorm';
 
-+ @Hypertable()
-@Entity()
++ @Hypertable({ ... })
+@Entity('page_loads')
 export class PageLoad {
-  @PrimaryColumn({ name: 'user_agent', type: 'varchar' })
-  userAgent!: string;
+  @PrimaryColumn({ type: 'varchar' })
+  user_agent!: string;
 
   @PrimaryColumn({ type: 'timestamp' })
   time!: Date;
@@ -82,8 +82,11 @@ import { PageLoad } from './models/PageLoad';
 const repository = AppDataSource.getRepository(PageLoad);
 const stats = await repository.getTimeBucket({
   timeRange: {
-    start,
-    end,
+    start: new Date('2025-01-01'),
+    end: new Date('2025-01-02'),
+  },
+  where: {
+    user_agent: 'Chrome',
   },
   bucket: {
     interval: '1 hour',
