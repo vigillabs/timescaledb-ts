@@ -19,7 +19,7 @@ describe('TimeBucket', () => {
     it('should generate query with count metric', () => {
       const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
       const { sql, params } = hypertable
-        .timeBucket(timeRange, {
+        .timeBucket({
           interval: '1 hour',
           metrics: [
             {
@@ -28,7 +28,9 @@ describe('TimeBucket', () => {
             },
           ],
         })
-        .build();
+        .build({
+          range: timeRange,
+        });
 
       expect({ sql, params }).toMatchSnapshot();
     });
@@ -36,7 +38,7 @@ describe('TimeBucket', () => {
     it('should generate query with distinct count metric', () => {
       const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
       const { sql, params } = hypertable
-        .timeBucket(timeRange, {
+        .timeBucket({
           interval: '1 hour',
           metrics: [
             {
@@ -46,7 +48,9 @@ describe('TimeBucket', () => {
             },
           ],
         })
-        .build();
+        .build({
+          range: timeRange,
+        });
 
       expect({ sql, params }).toMatchSnapshot();
     });
@@ -54,7 +58,7 @@ describe('TimeBucket', () => {
     it('should generate query with multiple metrics', () => {
       const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
       const { sql, params } = hypertable
-        .timeBucket(timeRange, {
+        .timeBucket({
           interval: '1 hour',
           metrics: [
             {
@@ -73,7 +77,9 @@ describe('TimeBucket', () => {
             },
           ],
         })
-        .build();
+        .build({
+          range: timeRange,
+        });
 
       expect({ sql, params }).toMatchSnapshot();
     });
@@ -84,7 +90,7 @@ describe('TimeBucket', () => {
         const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
 
         const { sql, params } = hypertable
-          .timeBucket(timeRange, {
+          .timeBucket({
             interval,
             metrics: [
               {
@@ -93,7 +99,9 @@ describe('TimeBucket', () => {
               },
             ],
           })
-          .build();
+          .build({
+            range: timeRange,
+          });
 
         expect({ sql, params, interval }).toMatchSnapshot();
       },
@@ -106,7 +114,7 @@ describe('TimeBucket', () => {
 
       expect(() => {
         hypertable
-          .timeBucket(timeRange, {
+          .timeBucket({
             interval: '1 hour',
             metrics: [
               {
@@ -116,7 +124,9 @@ describe('TimeBucket', () => {
               },
             ],
           })
-          .build();
+          .build({
+            range: timeRange,
+          });
       }).toThrow('Unsupported metric type: invalid_type');
     });
 
@@ -125,7 +135,7 @@ describe('TimeBucket', () => {
 
       // This will fail at runtime when PostgreSQL tries to parse the interval
       const { sql, params } = hypertable
-        .timeBucket(timeRange, {
+        .timeBucket({
           interval: 'invalid interval',
           metrics: [
             {
@@ -134,7 +144,9 @@ describe('TimeBucket', () => {
             },
           ],
         })
-        .build();
+        .build({
+          range: timeRange,
+        });
 
       expect({ sql, params }).toMatchSnapshot('Invalid interval format');
     });

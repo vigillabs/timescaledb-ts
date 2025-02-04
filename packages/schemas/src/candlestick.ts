@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { TimeRangeSchema } from './time-range';
+import { WhereClauseSchema } from './where';
 
 export const CandlestickAggregateOptionsSchema = z.object({
   price_column: z.string(),
@@ -31,4 +32,5 @@ export type GetCandlesticksOptions = z.infer<typeof GetCandlesticksOptionsSchema
 export const GetCandlesticksOptionsSchema = z.object({
   timeRange: TimeRangeSchema,
   config: CandlestickAggregateOptionsSchema,
+  where: WhereClauseSchema.optional(),
 });

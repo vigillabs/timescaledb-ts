@@ -1,9 +1,4 @@
-import {
-  CreateHypertableOptions,
-  CreateHypertableOptionsSchema,
-  TimeBucketConfig,
-  TimeRange,
-} from '@timescaledb/schemas';
+import { CreateHypertableOptions, CreateHypertableOptionsSchema, TimeBucketConfig } from '@timescaledb/schemas';
 import { HypertableErrors } from './errors';
 import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
 import { CompressionBuilder } from './compression';
@@ -148,7 +143,7 @@ export class Hypertable {
     return new CompressionBuilder(this.name, this.options);
   }
 
-  public timeBucket(range: TimeRange, config: TimeBucketConfig): TimeBucketBuilder {
-    return new TimeBucketBuilder(this.name, this.options.by_range.column_name, range, config);
+  public timeBucket(config: TimeBucketConfig): TimeBucketBuilder {
+    return new TimeBucketBuilder(this.name, this.options.by_range.column_name, config);
   }
 }

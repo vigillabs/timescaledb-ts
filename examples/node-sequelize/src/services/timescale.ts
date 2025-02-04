@@ -6,13 +6,15 @@ import { QueryTypes } from 'sequelize';
 import { TimescaleDB } from '@timescaledb/core';
 
 export async function getPageViewStats(range: TimeRange): Promise<PageViewStats[]> {
-  const { sql, params } = PageLoads.timeBucket(range, {
+  const { sql, params } = PageLoads.timeBucket({
     interval: '1 hour',
     metrics: [
       { type: 'count', alias: 'count' },
       { type: 'distinct_count', column: 'user_agent', alias: 'unique_users' },
     ],
-  }).build();
+  }).build({
+    range,
+  });
 
   const results = await sequelize.query(sql, {
     bind: params,
@@ -66,18 +68,13 @@ export async function getCandlestickData({
     bucket_interval: interval,
   });
 
-  let sql = candlestick.build();
-
-  // Convert $1, $2, $3 to :interval, :start, :end
-  sql = sql.replace('$1', ':interval').replace('$2', ':start').replace('$3', ':end');
+  const { sql, params } = candlestick.build({
+    range: { start, end },
+  });
 
   const results = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
-    replacements: {
-      interval,
-      start,
-      end,
-    },
+    replacements: params,
   });
 
   return results.map((row: any) => ({
