@@ -12,8 +12,7 @@ exports[`TimeBucket build should generate query with count metric 1`] = `
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -36,8 +35,7 @@ exports[`TimeBucket build should generate query with distinct count metric 1`] =
     time_bucket($1::interval, "time") AS interval,
     COUNT(DISTINCT "user_id") as "unique_users"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -61,8 +59,7 @@ exports[`TimeBucket build should generate query with interval 1 day 1`] = `
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -86,8 +83,7 @@ exports[`TimeBucket build should generate query with interval 1 hour 1`] = `
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -111,8 +107,7 @@ exports[`TimeBucket build should generate query with interval 1 minute 1`] = `
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -136,8 +131,7 @@ exports[`TimeBucket build should generate query with interval 1 month 1`] = `
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -161,8 +155,7 @@ exports[`TimeBucket build should generate query with interval 1 week 1`] = `
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -187,8 +180,7 @@ exports[`TimeBucket build should generate query with multiple metrics 1`] = `
     COUNT(DISTINCT "user_id") as "unique_users",
     COUNT(DISTINCT "session_id") as "unique_sessions"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
   GROUP BY interval
   ORDER BY interval DESC
 )
@@ -213,8 +205,55 @@ exports[`TimeBucket error handling should fail with invalid interval format: Inv
     time_bucket($1::interval, "time") AS interval,
     COUNT(*) as "total_count"
   FROM "my_table"
-  WHERE "time" >= $2
-    AND "time" <= $3
+  WHERE "time" >= $2 AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket where clause should generate query with comparison operator 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+    25,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3 AND "temperature" > $4
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket where clause should generate query with simple where condition 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+    "123",
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    COUNT(*) as "total_count"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3 AND "user_id" = $4
   GROUP BY interval
   ORDER BY interval DESC
 )

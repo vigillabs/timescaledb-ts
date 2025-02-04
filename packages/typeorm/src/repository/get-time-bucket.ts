@@ -1,7 +1,7 @@
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { TimescaleDB } from '@timescaledb/core';
-import { TimeBucketConfig, TimeBucketConfigSchema, TimeBucketOptions, TimeRange } from '@timescaledb/schemas';
+import { TimeBucketConfig, TimeBucketConfigSchema, TimeBucketOptions } from '@timescaledb/schemas';
 
 export async function getTimeBucket<T extends ObjectLiteral>(
   this: Repository<T>,
@@ -21,11 +21,6 @@ export async function getTimeBucket<T extends ObjectLiteral>(
 
   const hypertable = TimescaleDB.createHypertable(this.metadata.tableName, hypertableOptions);
 
-  const timeRange: TimeRange = {
-    start: options.timeRange.start,
-    end: options.timeRange.end,
-  };
-
   const builderConfig: TimeBucketConfig = {
     interval: options.bucket.interval,
     metrics: options.bucket.metrics.map((metric) => ({
@@ -37,7 +32,13 @@ export async function getTimeBucket<T extends ObjectLiteral>(
 
   TimeBucketConfigSchema.parse(builderConfig);
 
-  const { sql, params } = hypertable.timeBucket(timeRange, builderConfig).build();
+  const { sql, params } = hypertable.timeBucket(builderConfig).build({
+    range: {
+      start: options.timeRange.start,
+      end: options.timeRange.end,
+    },
+    where: options.where,
+  });
   const results = await this.query(sql, params);
 
   return results.map((row: any) => {

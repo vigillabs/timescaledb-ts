@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { ByRangeSchema } from './by-range';
 import { TimeRange } from './time-range';
+import { WhereClause } from './where';
 
 export const TimeBucketMetricTypeSchema = z.enum(['count', 'distinct_count']);
 export type TimeBucketMetricType = z.infer<typeof TimeBucketMetricTypeSchema>;
@@ -30,6 +31,7 @@ export type TimeBucketResult = z.infer<typeof TimeBucketResultSchema>;
 
 export const GetTimeBucketOptionsSchema = z.object({
   range: ByRangeSchema.required(),
+  where: z.string().optional(),
   config: TimeBucketConfigSchema.required(),
 });
 
@@ -49,4 +51,5 @@ export interface TimeBucketOptions<T> {
     interval: string;
     metrics: TimeBucketMetric<T>[];
   };
+  where?: WhereClause;
 }

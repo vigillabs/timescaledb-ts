@@ -1,18 +1,27 @@
 import sequelize from '../database';
 import { PageViewStats } from '../types';
-import { CompressionStats, TimeRange } from '@timescaledb/schemas';
+import { CompressionStats, TimeRange, WhereClause } from '@timescaledb/schemas';
 import { PageLoads } from '../../config/PageLoads';
 import { QueryTypes } from 'sequelize';
 import { TimescaleDB } from '@timescaledb/core';
 
-export async function getPageViewStats(range: TimeRange): Promise<PageViewStats[]> {
-  const { sql, params } = PageLoads.timeBucket(range, {
+export async function getPageViewStats({
+  range,
+  where,
+}: {
+  range: TimeRange;
+  where?: WhereClause;
+}): Promise<PageViewStats[]> {
+  const { sql, params } = PageLoads.timeBucket({
     interval: '1 hour',
     metrics: [
       { type: 'count', alias: 'count' },
       { type: 'distinct_count', column: 'user_agent', alias: 'unique_users' },
     ],
-  }).build();
+  }).build({
+    range,
+    where,
+  });
 
   const results = await sequelize.query(sql, {
     bind: params,
@@ -54,10 +63,12 @@ export async function getCandlestickData({
   start,
   end,
   interval = '1 hour',
+  where,
 }: {
   start: Date;
   end: Date;
   interval?: string;
+  where?: WhereClause;
 }) {
   const candlestick = TimescaleDB.createCandlestickAggregate('stock_prices', {
     time_column: 'timestamp',
@@ -66,18 +77,14 @@ export async function getCandlestickData({
     bucket_interval: interval,
   });
 
-  let sql = candlestick.build();
-
-  // Convert $1, $2, $3 to :interval, :start, :end
-  sql = sql.replace('$1', ':interval').replace('$2', ':start').replace('$3', ':end');
+  const { sql, params } = candlestick.build({
+    range: { start, end },
+    where,
+  });
 
   const results = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
-    replacements: {
-      interval,
-      start,
-      end,
-    },
+    bind: params,
   });
 
   return results.map((row: any) => ({

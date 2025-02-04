@@ -19,8 +19,10 @@ export async function getCandlesticks<T extends ObjectLiteral>(
     time_column: hypertableOptions.by_range.column_name,
   });
 
-  const sql = candlestick.build();
-  const params = [options.config.bucket_interval || '1 hour', options.timeRange.start, options.timeRange.end];
+  const { sql, params } = candlestick.build({
+    range: options.timeRange,
+    where: options.where,
+  });
 
   const results = await this.query(sql, params);
 

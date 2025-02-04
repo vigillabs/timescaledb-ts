@@ -1,7 +1,41 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Candlestick Aggregation should generate basic candlestick query 1`] = `
-"SELECT
+exports[`Candlestick Aggregation Candlestick Builder with Where Clause should generate candlestick query with time range and where clause 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+    "AAPL",
+    1000000,
+  ],
+  "sql": "SELECT
+  time_bucket($1::interval, "timestamp") as bucket_time,
+  open(candlestick_agg("timestamp", "price", "volume")) as open,
+  high(candlestick_agg("timestamp", "price", "volume")) as high,
+  low(candlestick_agg("timestamp", "price", "volume")) as low,
+  close(candlestick_agg("timestamp", "price", "volume")) as close,
+  open_time(candlestick_agg("timestamp", "price", "volume")) as open_time,
+  high_time(candlestick_agg("timestamp", "price", "volume")) as high_time,
+  low_time(candlestick_agg("timestamp", "price", "volume")) as low_time,
+  close_time(candlestick_agg("timestamp", "price", "volume")) as close_time
+  ,volume(candlestick_agg("timestamp", "price", "volume")) as volume,
+  vwap(candlestick_agg("timestamp", "price", "volume")) as vwap
+FROM "stock_prices"
+WHERE "timestamp" >= $2 AND "timestamp" <= $3 AND "symbol" = $4 AND "volume" > $5
+GROUP BY bucket_time
+ORDER BY bucket_time ASC;",
+}
+`;
+
+exports[`Candlestick Aggregation Candlestick Builder with Where Clause should work without where clause 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "SELECT
   time_bucket($1::interval, "timestamp") as bucket_time,
   open(candlestick_agg("timestamp", "price")) as open,
   high(candlestick_agg("timestamp", "price")) as high,
@@ -14,11 +48,37 @@ exports[`Candlestick Aggregation should generate basic candlestick query 1`] = `
 FROM "stock_prices"
 WHERE "timestamp" >= $2 AND "timestamp" <= $3
 GROUP BY bucket_time
-ORDER BY bucket_time ASC;"
+ORDER BY bucket_time ASC;",
+}
+`;
+
+exports[`Candlestick Aggregation should generate basic candlestick query 1`] = `
+{
+  "params": [
+    "1 hour",
+  ],
+  "sql": "SELECT
+  time_bucket($1::interval, "timestamp") as bucket_time,
+  open(candlestick_agg("timestamp", "price")) as open,
+  high(candlestick_agg("timestamp", "price")) as high,
+  low(candlestick_agg("timestamp", "price")) as low,
+  close(candlestick_agg("timestamp", "price")) as close,
+  open_time(candlestick_agg("timestamp", "price")) as open_time,
+  high_time(candlestick_agg("timestamp", "price")) as high_time,
+  low_time(candlestick_agg("timestamp", "price")) as low_time,
+  close_time(candlestick_agg("timestamp", "price")) as close_time
+FROM "stock_prices"
+GROUP BY bucket_time
+ORDER BY bucket_time ASC;",
+}
 `;
 
 exports[`Candlestick Aggregation should properly escape identifiers 1`] = `
-"SELECT
+{
+  "params": [
+    "1 hour",
+  ],
+  "sql": "SELECT
   time_bucket($1::interval, "time""stamp") as bucket_time,
   open(candlestick_agg("time""stamp", "price""value")) as open,
   high(candlestick_agg("time""stamp", "price""value")) as high,
@@ -29,7 +89,7 @@ exports[`Candlestick Aggregation should properly escape identifiers 1`] = `
   low_time(candlestick_agg("time""stamp", "price""value")) as low_time,
   close_time(candlestick_agg("time""stamp", "price""value")) as close_time
 FROM "stock_prices"
-WHERE "time""stamp" >= $2 AND "time""stamp" <= $3
 GROUP BY bucket_time
-ORDER BY bucket_time ASC;"
+ORDER BY bucket_time ASC;",
+}
 `;

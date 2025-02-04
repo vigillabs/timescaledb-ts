@@ -34,5 +34,7 @@
     "build": "tsc",
     "test": "jest --runInBand"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@timescaledb/schemas": "workspace:^"
+  }
 }

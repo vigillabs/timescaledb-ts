@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { PageLoad } from '../models/PageLoad';
 import { HourlyPageViews } from '../models/HourlyPageViews';
 import { StockPrice } from '../models/StockPrice';
+import { WhereClauseSchema } from '@timescaledb/schemas';
 
 const router = Router();
 
@@ -25,6 +26,8 @@ router.get('/stats', async (req, res) => {
   try {
     const start = new Date(req.query.start as string);
     const end = new Date(req.query.end as string);
+    const where = req.query.where as string;
+    const whereClause = where ? WhereClauseSchema.parse(JSON.parse(where)) : undefined;
 
     const repository = AppDataSource.getRepository(PageLoad);
 
@@ -33,6 +36,7 @@ router.get('/stats', async (req, res) => {
         start,
         end,
       },
+      where: whereClause,
       bucket: {
         interval: '1 hour',
         metrics: [
@@ -84,9 +88,8 @@ router.get('/candlestick', async (req, res) => {
   try {
     const start = new Date(req.query.start as string);
     const end = new Date(req.query.end as string);
-    // TODO - https://github.com/timescale/timescaledb-ts/issues/10
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const symbol = req.query.symbol as string;
+    const where = req.query.where as string;
+    const whereClause = where ? WhereClauseSchema.parse(JSON.parse(where)) : undefined;
 
     const repository = AppDataSource.getRepository(StockPrice);
     const candlesticks = await repository.getCandlesticks({
@@ -97,6 +100,7 @@ router.get('/candlestick', async (req, res) => {
         volume_column: 'volume',
         bucket_interval: '1 hour',
       },
+      where: whereClause,
     });
 
     res.json(candlesticks);

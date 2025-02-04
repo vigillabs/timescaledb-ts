@@ -119,21 +119,43 @@ const hypertable = TimescaleDB.createHypertable('measurements', {
   by_range: { column_name: 'time' },
 });
 
+// Basic time bucket query
 const { sql, params } = hypertable
-  .timeBucket(
-    {
+  .timeBucket({
+    interval: '1 hour',
+    metrics: [
+      { type: 'count', alias: 'total' },
+      { type: 'distinct_count', column: 'device_id', alias: 'unique_devices' },
+    ],
+  })
+  .build({
+    range: {
       start: new Date('2025-01-01'),
       end: new Date('2025-02-01'),
     },
-    {
-      interval: TimeInterval['1Hour'],
-      metrics: [
-        { type: 'count', alias: 'total' },
-        { type: 'distinct_count', column: 'device_id', alias: 'unique_devices' },
-      ],
+  });
+
+// With where clause filtering
+const { sql: filteredSql, params: filteredParams } = hypertable
+  .timeBucket({
+    interval: '1 hour',
+    metrics: [
+      { type: 'count', alias: 'total' },
+      { type: 'distinct_count', column: 'device_id', alias: 'unique_devices' },
+    ],
+  })
+  .build({
+    range: {
+      start: new Date('2025-01-01'),
+      end: new Date('2025-02-01'),
     },
-  )
-  .build();
+    where: {
+      device_id: 'sensor-123', // Simple equality
+      temperature: { '>': 25 }, // Comparison operator
+      status: { IN: ['active', 'warning'] }, // IN clause
+      location: { 'NOT IN': ['zone-a', 'zone-b'] }, // NOT IN clause
+    },
+  });
 ```
 
 #### Creating Candlestick Aggregates
@@ -146,26 +168,31 @@ const candlestick = TimescaleDB.createCandlestickAggregate('stock_prices', {
   bucket_interval: '1 hour', // defaults to '1 hour'
 });
 
-// Generate SQL
-const sql = candlestick.build();
+// Basic candlestick query
+const { sql, params } = candlestick.build({
+  range: {
+    start: new Date('2025-01-01'),
+    end: new Date('2025-01-02'),
+  },
+});
 
-// Execute with parameters
-const params = [
-  '1 hour', // bucket interval
-  new Date('2025-01-01'), // start time
-  new Date('2025-01-02'), // end time
-];
+// With where clause filtering
+const { sql: filteredSql, params: filteredParams } = candlestick.build({
+  range: {
+    start: new Date('2025-01-01'),
+    end: new Date('2025-01-02'),
+  },
+  where: {
+    symbol: 'AAPL',
+    volume: { '>': 1000000 },
+    exchange: { IN: ['NYSE', 'NASDAQ'] },
+  },
+});
 
-// Returns: bucket_time, open, high, low, close, volume, vwap, etc.
+// Returns candlestick data:
+// bucket_time, open, high, low, close, volume, vwap, etc.
 const results = await query(sql, params);
 ```
-
-The candlestick builder generates SQL that returns:
-
-- Bucket timestamps (`bucket_time`)
-- OHLC prices (`open`, `high`, `low`, `close`)
-- OHLC timestamps (`open_time`, `high_time`, `low_time`, `close_time`)
-- Volume data (`volume`, `vwap`) when `volume_column` is provided
 
 ## Examples
 

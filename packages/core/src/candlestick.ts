@@ -1,5 +1,10 @@
-import { CandlestickAggregateOptions, CandlestickAggregateOptionsSchema } from '@timescaledb/schemas';
-import { escapeIdentifier } from '@timescaledb/utils';
+import {
+  CandlestickAggregateOptions,
+  CandlestickAggregateOptionsSchema,
+  TimeRange,
+  WhereClause,
+} from '@timescaledb/schemas';
+import { buildWhereClause, escapeIdentifier } from '@timescaledb/utils';
 
 export class CandlestickAggregateBuilder {
   private statements: string[] = [];
@@ -11,12 +16,24 @@ export class CandlestickAggregateBuilder {
     this.options = CandlestickAggregateOptionsSchema.parse(options);
   }
 
-  public build(): string {
+  private buildWhere(where: WhereClause, paramOffset = 1): { sql: string; params: any[] } {
+    if (!where) {
+      return { sql: '', params: [] };
+    }
+
+    const { sql, params } = buildWhereClause(where, paramOffset);
+
+    return { sql: ` AND ${sql}`, params };
+  }
+
+  public build({ where, range }: { where?: WhereClause; range?: TimeRange } = {}): { sql: string; params: any[] } {
     const tableName = escapeIdentifier(this.tableName);
     const timeColumn = escapeIdentifier(this.options.time_column);
     const priceColumn = escapeIdentifier(this.options.price_column);
     const volumeColumn = this.options.volume_column ? escapeIdentifier(this.options.volume_column) : null;
     const interval = '$1::interval';
+
+    this.statements = [];
 
     this.statements.push(`SELECT`);
     this.statements.push(`  time_bucket(${interval}, ${timeColumn}) as bucket_time,`);
@@ -51,10 +68,28 @@ export class CandlestickAggregateBuilder {
     }
 
     this.statements.push(`FROM ${tableName}`);
-    this.statements.push(`WHERE ${timeColumn} >= $2 AND ${timeColumn} <= $3`);
+
+    const params: (string | Date)[] = [this.options.bucket_interval || '1 hour'];
+    if (range) {
+      params.push(range.start, range.end);
+    }
+
+    const whereClause = this.buildWhere(where as WhereClause, params.length + 1);
+    const timeRangeWhere = range ? `WHERE ${timeColumn} >= $2 AND ${timeColumn} <= $3` : '';
+    const fullWhere = timeRangeWhere + whereClause.sql;
+
+    if (fullWhere) {
+      this.statements.push(fullWhere);
+    }
+
+    params.push(...whereClause.params);
+
     this.statements.push(`GROUP BY bucket_time`);
     this.statements.push(`ORDER BY bucket_time ASC;`);
 
-    return this.statements.join('\n');
+    return {
+      sql: this.statements.join('\n'),
+      params,
+    };
   }
 }
