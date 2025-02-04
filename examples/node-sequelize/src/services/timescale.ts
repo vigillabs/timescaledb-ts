@@ -74,7 +74,7 @@ export async function getCandlestickData({
 
   const results = await sequelize.query(sql, {
     type: QueryTypes.SELECT,
-    replacements: params,
+    bind: params,
   });
 
   return results.map((row: any) => ({
