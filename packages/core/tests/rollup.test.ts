@@ -1,4 +1,3 @@
-// tests/rollup.test.ts
 import { describe, it, expect } from '@jest/globals';
 import { RollupBuilder } from '../src/rollup';
 import { RollupConfig, RollupFunctionType } from '@timescaledb/schemas';
