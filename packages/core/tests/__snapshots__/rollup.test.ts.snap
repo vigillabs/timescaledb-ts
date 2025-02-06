@@ -20,6 +20,54 @@ exports[`RollupBuilder down() should properly escape view names with special cha
 ]
 `;
 
+exports[`RollupBuilder inspect() should generate basic inspect SQL 1`] = `
+"
+      SELECT 
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = 'hourly_metrics'
+        ) as source_view_exists,
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = 'daily_rollup'
+        ) as rollup_view_exists;
+    "
+`;
+
+exports[`RollupBuilder inspect() should handle schema qualified names 1`] = `
+"
+      SELECT 
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = 'public.hourly_metrics'
+        ) as source_view_exists,
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = 'public.daily_rollup'
+        ) as rollup_view_exists;
+    "
+`;
+
+exports[`RollupBuilder inspect() should properly escape view names with special characters 1`] = `
+"
+      SELECT 
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = 'hourly"metrics'
+        ) as source_view_exists,
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = 'daily"rollup'
+        ) as rollup_view_exists;
+    "
+`;
+
 exports[`RollupBuilder up() refresh policy should generate refresh policy SQL 1`] = `
 "SELECT add_continuous_aggregate_policy('daily_rollup',
       start_offset => INTERVAL '30 days',

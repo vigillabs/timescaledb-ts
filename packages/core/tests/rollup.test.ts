@@ -80,14 +80,14 @@ describe('RollupBuilder', () => {
           ...baseConfig.rollupOptions,
           rollupRules: [
             {
-              rollupFn: 'rollup',
+              rollupFn: RollupFunctionType.Rollup,
               sourceColumn: 'percentile"hourly',
               targetColumn: 'percentile"daily',
             },
           ],
         },
       };
-      const builder = new RollupBuilder(config as RollupConfig);
+      const builder = new RollupBuilder(config);
       const sql = builder.up().build();
       expect(sql).toMatchSnapshot();
     });
@@ -162,6 +162,77 @@ describe('RollupBuilder', () => {
       const builder = new RollupBuilder(config);
       const sql = builder.down().build();
       expect(sql).toMatchSnapshot();
+    });
+  });
+
+  describe('inspect()', () => {
+    it('should generate basic inspect SQL', () => {
+      const builder = new RollupBuilder(baseConfig);
+      const sql = builder.inspect().build();
+      expect(sql).toMatchSnapshot();
+    });
+
+    it('should properly escape view names with special characters', () => {
+      const config = {
+        ...baseConfig,
+        rollupOptions: {
+          ...baseConfig.rollupOptions,
+          name: 'daily"rollup',
+          sourceView: 'hourly"metrics',
+        },
+      };
+      const builder = new RollupBuilder(config);
+      const sql = builder.inspect().build();
+      expect(sql).toMatchSnapshot();
+    });
+
+    it('should handle schema qualified names', () => {
+      const config = {
+        ...baseConfig,
+        rollupOptions: {
+          ...baseConfig.rollupOptions,
+          name: 'public.daily_rollup',
+          sourceView: 'public.hourly_metrics',
+        },
+      };
+      const builder = new RollupBuilder(config);
+      const sql = builder.inspect().build();
+      expect(sql).toMatchSnapshot();
+    });
+  });
+
+  describe('error handling', () => {
+    it('should validate required source columns', () => {
+      const config = {
+        ...baseConfig,
+        rollupOptions: {
+          ...baseConfig.rollupOptions,
+          rollupRules: [
+            {
+              rollupFn: RollupFunctionType.Rollup,
+              // @ts-ignore
+              sourceColumn: undefined,
+              targetColumn: 'rolled_up_value',
+            },
+          ],
+        },
+      };
+      // @ts-ignore
+      const builder = new RollupBuilder(config as RollupConfig);
+      expect(() => builder.up().build()).toThrow();
+    });
+
+    it('should validate bucket interval', () => {
+      const config = {
+        ...baseConfig,
+        rollupOptions: {
+          ...baseConfig.rollupOptions,
+          // @ts-ignore
+          bucketInterval: '',
+        },
+      };
+      const builder = new RollupBuilder(config as RollupConfig);
+      expect(() => builder.up().build()).toThrow();
     });
   });
 });

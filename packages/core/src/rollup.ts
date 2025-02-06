@@ -1,6 +1,29 @@
 import { RollupConfig, RollupRule } from '@timescaledb/schemas';
 import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
 
+class RollupInspectBuilder {
+  constructor(private config: RollupConfig) {}
+
+  public build(): string {
+    const sourceView = escapeLiteral(this.config.rollupOptions.sourceView);
+    const rollupView = escapeLiteral(this.config.rollupOptions.name);
+
+    return `
+      SELECT 
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = ${sourceView}
+        ) as source_view_exists,
+        EXISTS (
+          SELECT FROM information_schema.views 
+          WHERE table_schema = 'public' 
+          AND table_name = ${rollupView}
+        ) as rollup_view_exists;
+    `;
+  }
+}
+
 class RollupUpBuilder {
   private statements: string[] = [];
 
@@ -11,13 +34,16 @@ class RollupUpBuilder {
       const sourceColumn = escapeIdentifier(rule.sourceColumn);
       const targetColumn = escapeIdentifier(rule.targetColumn || rule.sourceColumn);
 
-      switch (rule.rollupFn) {
-        case 'mean':
-          return `mean(rollup(${sourceColumn})) as ${targetColumn}`;
-        case 'rollup':
-          return `rollup(${sourceColumn}) as ${targetColumn}`;
+      const rollup = `rollup(${rule.sourceColumn})`;
+
+      switch (rule.aggregateType) {
+        case 'sum':
+          return `sum(${sourceColumn}) as ${targetColumn}`;
+        case 'avg':
+          return `avg(${sourceColumn}) as ${targetColumn}`;
+
         default:
-          return `${rule.rollupFn}(${sourceColumn}) as ${targetColumn}`;
+          return `${rollup} as ${targetColumn}`;
       }
     });
 
@@ -84,5 +110,9 @@ export class RollupBuilder {
 
   public down(): RollupDownBuilder {
     return new RollupDownBuilder(this.config);
+  }
+
+  public inspect(): RollupInspectBuilder {
+    return new RollupInspectBuilder(this.config);
   }
 }

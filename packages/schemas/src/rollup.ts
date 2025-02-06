@@ -1,14 +1,14 @@
 import { z } from 'zod';
-import { CreateContinuousAggregateOptionsSchema } from './continuous-aggregate';
+import { AggregateTypeSchema, CreateContinuousAggregateOptionsSchema } from './continuous-aggregate';
 
 export enum RollupFunctionType {
   Rollup = 'rollup',
-  Mean = 'mean',
 }
 
 export const RollupFunctionTypeSchema = z.nativeEnum(RollupFunctionType);
 
 export const RollupRuleSchema = z.object({
+  aggregateType: AggregateTypeSchema.optional(),
   rollupFn: RollupFunctionTypeSchema,
   sourceColumn: z.string(),
   targetColumn: z.string().optional(),

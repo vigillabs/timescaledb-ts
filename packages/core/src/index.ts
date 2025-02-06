@@ -3,11 +3,13 @@ import {
   CreateContinuousAggregateOptions,
   CreateExtensionOptions,
   CreateHypertableOptions,
+  RollupConfig,
 } from '@timescaledb/schemas';
 import { Hypertable } from './hypertable';
 import { Extension } from './extension';
 import { ContinuousAggregate } from './continuous-aggregate';
 import { CandlestickAggregateBuilder } from './candlestick';
+import { RollupBuilder } from './rollup';
 
 export const name = '@timescaledb/core';
 
@@ -39,6 +41,10 @@ export class TimescaleDB {
     options: CandlestickAggregateOptions,
   ): CandlestickAggregateBuilder {
     return new CandlestickAggregateBuilder(tableName, options);
+  }
+
+  public static createRollup(config: RollupConfig): RollupBuilder {
+    return new RollupBuilder(config);
   }
 }
 
