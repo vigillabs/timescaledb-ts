@@ -7,3 +7,4 @@ export * from './time-bucket';
 export * from './continuous-aggregate';
 export * from './candlestick';
 export * from './where';
+export * from './rollup';
