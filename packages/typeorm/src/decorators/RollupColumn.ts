@@ -37,6 +37,21 @@ export function RollupColumn(options: RollupColumnOptions) {
       configurable: true,
     });
 
+    if (!target.constructor.prototype.toJSON) {
+      target.constructor.prototype.toJSON = function () {
+        const copy = { ...this };
+        // Remove underscore prefixed properties and add clean ones
+        Object.keys(copy).forEach((key) => {
+          if (key.startsWith('_')) {
+            const cleanKey = key.slice(1);
+            copy[cleanKey] = copy[key];
+            delete copy[key];
+          }
+        });
+        return copy;
+      };
+    }
+
     return target;
   };
 }
