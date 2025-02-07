@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { RollupBuilder } from '../src/rollup';
-import { RollupConfig, RollupFunctionType } from '@timescaledb/schemas';
+import { RollupConfig, RollupFunctionType, AggregateType } from '@timescaledb/schemas';
 
 describe('RollupBuilder', () => {
   const baseConfig: RollupConfig = {
@@ -23,6 +23,12 @@ describe('RollupBuilder', () => {
           rollupFn: RollupFunctionType.Rollup,
           sourceColumn: 'percentile_hourly',
           targetColumn: 'percentile_daily',
+        },
+        {
+          rollupFn: RollupFunctionType.Rollup,
+          sourceColumn: 'total_hourly',
+          targetColumn: 'total_daily',
+          aggregateType: AggregateType.Sum,
         },
       ],
       materializedOnly: false,
@@ -59,11 +65,6 @@ describe('RollupBuilder', () => {
               rollupFn: RollupFunctionType.Rollup,
               sourceColumn: 'percentile_hourly',
               targetColumn: 'percentile_daily',
-            },
-            {
-              rollupFn: RollupFunctionType.Mean,
-              sourceColumn: 'response_time',
-              targetColumn: 'mean_response_time',
             },
           ],
         },
