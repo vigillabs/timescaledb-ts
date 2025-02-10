@@ -4,6 +4,7 @@ import { PageLoad } from '../models/PageLoad';
 import { HourlyPageViews } from '../models/HourlyPageViews';
 import { StockPrice } from '../models/StockPrice';
 import { WhereClauseSchema } from '@timescaledb/schemas';
+import { DailyPageStats } from '../models/DailyPageStats';
 
 const router = Router();
 
@@ -81,6 +82,26 @@ router.get('/hourly', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get hourly stats' });
+  }
+});
+
+router.get('/daily', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+
+    const query = AppDataSource.getRepository(DailyPageStats)
+      .createQueryBuilder()
+      .where('bucket >= :start', { start })
+      .andWhere('bucket <= :end', { end })
+      .orderBy('bucket', 'DESC');
+
+    const dailyStats = await query.getMany();
+
+    res.json(dailyStats);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get daily stats' });
   }
 });
 

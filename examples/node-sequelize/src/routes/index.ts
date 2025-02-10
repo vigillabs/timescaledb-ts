@@ -2,6 +2,7 @@ import { Router } from 'express';
 import PageLoad from '../models/PageLoad';
 import { getPageViewStats, getCompressionStats, getCandlestickData } from '../services/timescale';
 import HourlyPageView from '../models/HourlyPageView';
+import DailyPageStats from '../models/DailyPageStats';
 import { Op } from 'sequelize';
 import { WhereClauseSchema } from '@timescaledb/schemas';
 
@@ -87,6 +88,27 @@ router.get('/candlestick', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get candlestick data' });
+  }
+});
+
+router.get('/daily', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+
+    const dailyStats = await DailyPageStats.findAll({
+      where: {
+        bucket: {
+          [Op.between]: [start, end],
+        },
+      },
+      order: [['bucket', 'DESC']],
+    });
+
+    res.json(dailyStats);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get daily stats' });
   }
 });
 

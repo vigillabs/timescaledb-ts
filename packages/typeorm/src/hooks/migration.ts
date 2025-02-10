@@ -6,6 +6,7 @@ import { CONTINUOUS_AGGREGATE_METADATA_KEY, ContinuousAggregateMetadata } from '
 import { AGGREGATE_COLUMN_METADATA_KEY } from '../decorators/AggregateColumn';
 import { AggregateColumnOptions } from '@timescaledb/schemas';
 import { validateBucketColumn } from '../decorators/BucketColumn';
+import { ROLLUP_METADATA_KEY } from '../decorators/Rollup';
 
 const originalRunMigrations = DataSource.prototype.runMigrations;
 const originalUndoLastMigration = DataSource.prototype.undoLastMigration;
@@ -18,8 +19,9 @@ DataSource.prototype.initialize = async function () {
   for (const entity of this.entityMetadatas) {
     const hypertableOptions = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, entity.target);
     const aggregateOptions = Reflect.getMetadata(CONTINUOUS_AGGREGATE_METADATA_KEY, entity.target);
+    const rollupOptions = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target);
 
-    if (hypertableOptions || aggregateOptions) {
+    if (hypertableOptions || aggregateOptions || rollupOptions) {
       const repository = this.getRepository(entity.target);
       Object.assign(repository, timescaleMethods);
     }
@@ -32,8 +34,13 @@ async function setupTimescaleExtension(dataSource: DataSource) {
   try {
     const extension = TimescaleDB.createExtension();
     await dataSource.query(extension.up().build());
+
+    await dataSource.query('CREATE EXTENSION IF NOT EXISTS timescaledb_toolkit;');
   } catch (error) {
-    if (!(error as Error).message.includes('extension "timescaledb" already exists')) {
+    if (
+      !(error as Error).message.includes('extension "timescaledb" already exists') &&
+      !(error as Error).message.includes('extension "timescaledb_toolkit" already exists')
+    ) {
       throw error;
     }
   }
@@ -42,9 +49,7 @@ async function setupTimescaleExtension(dataSource: DataSource) {
 DataSource.prototype.runMigrations = async function (options?: { transaction?: 'all' | 'none' | 'each' }) {
   const migrations = await originalRunMigrations.call(this, options);
 
-  await setupTimescaleExtension(this);
-  await setupHypertables(this);
-  await setupContinuousAggregates(this);
+  await setupTimescaleObjects(this);
 
   return migrations;
 };
@@ -113,18 +118,10 @@ async function setupTimescaleObjects(dataSource: DataSource) {
     throw new Error('DataSource must be initialized before setting up TimescaleDB objects');
   }
 
-  const extension = TimescaleDB.createExtension();
-  const extensionSql = extension.up().build();
-
-  try {
-    await dataSource.query(extensionSql);
-  } catch (error) {
-    if (!(error as Error).message.includes('extension "timescaledb" already exists')) {
-      throw error;
-    }
-  }
-
+  await setupTimescaleExtension(dataSource);
   await setupHypertables(dataSource);
+  await setupContinuousAggregates(dataSource);
+  await setupRollups(dataSource);
 }
 
 async function removeContinuousAggregates(dataSource: DataSource) {
@@ -156,13 +153,13 @@ async function removeTimescaleObjects(dataSource: DataSource) {
     throw new Error('DataSource must be initialized before removing TimescaleDB objects');
   }
 
+  await removeRollups(dataSource);
   await removeContinuousAggregates(dataSource);
   await removeHypertables(dataSource);
 }
 
 async function validateAggregateColumns(dataSource: DataSource) {
   for (const entity of dataSource.entityMetadatas) {
-    // Try both the prototype and constructor
     const aggregateColumns =
       // @ts-ignore
       Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target.prototype) ||
@@ -252,6 +249,64 @@ async function setupContinuousAggregates(dataSource: DataSource) {
       if (refreshPolicy) {
         await dataSource.query(refreshPolicy);
       }
+    }
+  }
+}
+
+async function setupRollups(dataSource: DataSource) {
+  const entities = dataSource.entityMetadatas;
+
+  for (const entity of entities) {
+    const rollupMetadata = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target);
+
+    if (!rollupMetadata) continue;
+
+    const { rollupConfig } = rollupMetadata;
+    const builder = TimescaleDB.createRollup(rollupConfig);
+
+    try {
+      const inspectResults = await dataSource.query(builder.inspect().build());
+
+      if (!inspectResults[0].source_view_exists) {
+        console.warn(
+          `Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`,
+        );
+        continue;
+      }
+
+      if (inspectResults[0].rollup_view_exists) {
+        console.log(`Rollup view ${entity.tableName} already exists, skipping creation`);
+        continue;
+      }
+
+      const sql = builder.up().build();
+      await dataSource.query(sql);
+
+      const refreshPolicy = builder.up().getRefreshPolicy();
+      if (refreshPolicy) {
+        await dataSource.query(refreshPolicy);
+      }
+    } catch (error) {
+      console.error(`Failed to setup rollup for ${entity.tableName}:`, error);
+      throw error;
+    }
+  }
+}
+
+async function removeRollups(dataSource: DataSource) {
+  const entities = dataSource.entityMetadatas;
+
+  for (const entity of entities) {
+    const rollupMetadata = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target);
+
+    if (!rollupMetadata) continue;
+
+    const { rollupConfig } = rollupMetadata;
+    const builder = TimescaleDB.createRollup(rollupConfig);
+    const statements = builder.down().build();
+
+    for (const sql of statements) {
+      await dataSource.query(sql);
     }
   }
 }
