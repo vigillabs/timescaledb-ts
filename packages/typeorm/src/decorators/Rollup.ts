@@ -1,7 +1,7 @@
 /// <reference types="reflect-metadata" />
 import { getMetadataArgsStorage, ViewEntity } from 'typeorm';
 import { CreateContinuousAggregateOptions, RollupConfig } from '@timescaledb/schemas';
-import { validateBucketColumn } from './BucketColumn';
+import { BUCKET_COLUMN_METADATA_KEY, validateBucketColumn } from './BucketColumn';
 import { ROLLUP_COLUMN_METADATA_KEY } from './RollupColumn';
 
 export const ROLLUP_METADATA_KEY = Symbol('timescale:rollup');
@@ -22,6 +22,9 @@ export interface RollupMetadata {
 export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Function, options: RollupOptions) {
   return function (target: T): T {
     const targetBucketMetadata = validateBucketColumn(target);
+    validateSourceBucketColumn(sourceModel, {
+      source_column: targetBucketMetadata.source_column,
+    });
 
     const sourceBucketMetadata = validateBucketColumn(sourceModel);
 
@@ -73,4 +76,18 @@ export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Fun
       synchronize: false,
     })(target) as T;
   };
+}
+
+function validateSourceBucketColumn(sourceModel: Function, bucketMetadata: { source_column: string }) {
+  // Get bucket column metadata from source model
+  const sourceBucketMetadata = Reflect.getMetadata(BUCKET_COLUMN_METADATA_KEY, sourceModel);
+
+  if (!sourceBucketMetadata) {
+    throw new Error('Source model must have a bucket column');
+  }
+
+  // Check if the rollup's bucket column references the source's bucket column
+  if (bucketMetadata.source_column !== sourceBucketMetadata.propertyKey.toString()) {
+    throw new Error('Rollup bucket column must reference a bucket column from the source view');
+  }
 }
