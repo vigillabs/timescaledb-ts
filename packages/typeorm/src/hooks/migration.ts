@@ -4,7 +4,7 @@ import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { timescaleMethods } from '../repository/TimescaleRepository';
 import { CONTINUOUS_AGGREGATE_METADATA_KEY, ContinuousAggregateMetadata } from '../decorators/ContinuousAggregate';
 import { AGGREGATE_COLUMN_METADATA_KEY } from '../decorators/AggregateColumn';
-import { AggregateColumnOptions, RollupConfig } from '@timescaledb/schemas';
+import { AggregateColumnOptions } from '@timescaledb/schemas';
 import { validateBucketColumn } from '../decorators/BucketColumn';
 import { ROLLUP_METADATA_KEY } from '../decorators/Rollup';
 
@@ -160,7 +160,6 @@ async function removeTimescaleObjects(dataSource: DataSource) {
 
 async function validateAggregateColumns(dataSource: DataSource) {
   for (const entity of dataSource.entityMetadatas) {
-    // Try both the prototype and constructor
     const aggregateColumns =
       // @ts-ignore
       Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target.prototype) ||
@@ -258,35 +257,38 @@ async function setupRollups(dataSource: DataSource) {
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
-    const rollupConfig = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target) as RollupConfig;
+    const rollupMetadata = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target);
 
-    if (!rollupConfig) continue;
+    if (!rollupMetadata) continue;
 
+    const { rollupConfig } = rollupMetadata;
     const builder = TimescaleDB.createRollup(rollupConfig);
 
-    // Check existence of views
-    const inspectResults = await dataSource.query(builder.inspect().build());
+    try {
+      const inspectResults = await dataSource.query(builder.inspect().build());
 
-    if (!inspectResults[0].source_view_exists) {
-      console.warn(
-        `Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`,
-      );
-      continue;
-    }
+      if (!inspectResults[0].source_view_exists) {
+        console.warn(
+          `Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`,
+        );
+        continue;
+      }
 
-    if (inspectResults[0].rollup_view_exists) {
-      console.log(`Rollup view ${entity.tableName} already exists, skipping creation`);
-      continue;
-    }
+      if (inspectResults[0].rollup_view_exists) {
+        console.log(`Rollup view ${entity.tableName} already exists, skipping creation`);
+        continue;
+      }
 
-    // Create the rollup view
-    const sql = builder.up().build();
-    await dataSource.query(sql);
+      const sql = builder.up().build();
+      await dataSource.query(sql);
 
-    // Add refresh policy if configured
-    const refreshPolicy = builder.up().getRefreshPolicy();
-    if (refreshPolicy) {
-      await dataSource.query(refreshPolicy);
+      const refreshPolicy = builder.up().getRefreshPolicy();
+      if (refreshPolicy) {
+        await dataSource.query(refreshPolicy);
+      }
+    } catch (error) {
+      console.error(`Failed to setup rollup for ${entity.tableName}:`, error);
+      throw error;
     }
   }
 }
@@ -295,10 +297,11 @@ async function removeRollups(dataSource: DataSource) {
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
-    const rollupConfig = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target) as RollupConfig;
+    const rollupMetadata = Reflect.getMetadata(ROLLUP_METADATA_KEY, entity.target);
 
-    if (!rollupConfig) continue;
+    if (!rollupMetadata) continue;
 
+    const { rollupConfig } = rollupMetadata;
     const builder = TimescaleDB.createRollup(rollupConfig);
     const statements = builder.down().build();
 

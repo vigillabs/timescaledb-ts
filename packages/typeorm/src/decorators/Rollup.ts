@@ -11,9 +11,19 @@ export interface RollupOptions extends Omit<CreateContinuousAggregateOptions, 't
   materialized_only?: boolean;
 }
 
+export interface RollupMetadata {
+  sourceModel: Function;
+  options: CreateContinuousAggregateOptions;
+  rollupConfig: RollupConfig;
+  sourceBucketColumn: string;
+  targetBucketColumn: string;
+}
+
 export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Function, options: RollupOptions) {
   return function (target: T): T {
-    const bucketMetadata = validateBucketColumn(target);
+    const targetBucketMetadata = validateBucketColumn(target);
+
+    const sourceBucketMetadata = validateBucketColumn(sourceModel);
 
     const sourceMetadata = getMetadataArgsStorage().tables.find((table) => table.target === sourceModel);
     if (!sourceMetadata) {
@@ -23,10 +33,11 @@ export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Fun
     const rollupColumns = Reflect.getMetadata(ROLLUP_COLUMN_METADATA_KEY, target) || {};
 
     const rollupConfig: RollupConfig = {
+      // @ts-ignore
       continuousAggregateOptions: {
         ...options,
         name: options.name,
-        time_column: bucketMetadata.source_column,
+        time_column: sourceBucketMetadata.source_column,
       },
       rollupOptions: {
         sourceView: sourceMetadata.name!,
@@ -39,10 +50,22 @@ export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Fun
           sourceColumn: column.source_column,
           targetColumn: column.propertyKey.toString(),
         })),
+        bucketColumn: {
+          source: sourceBucketMetadata.propertyKey.toString(),
+          target: targetBucketMetadata.propertyKey.toString(),
+        },
       },
     };
 
-    Reflect.defineMetadata(ROLLUP_METADATA_KEY, rollupConfig, target);
+    const metadata: RollupMetadata = {
+      sourceModel,
+      options,
+      rollupConfig,
+      sourceBucketColumn: sourceBucketMetadata.propertyKey.toString(),
+      targetBucketColumn: targetBucketMetadata.propertyKey.toString(),
+    };
+
+    Reflect.defineMetadata(ROLLUP_METADATA_KEY, metadata, target);
 
     return ViewEntity({
       name: options.name,

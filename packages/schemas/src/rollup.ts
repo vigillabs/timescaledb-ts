@@ -22,6 +22,10 @@ export const RollupOptionsSchema = z.object({
   bucketInterval: z.string(),
   rollupRules: z.array(RollupRuleSchema),
   materializedOnly: z.boolean().default(false),
+  bucketColumn: z.object({
+    source: z.string(),
+    target: z.string(),
+  }),
   refreshPolicy: z
     .object({
       startOffset: z.string(),

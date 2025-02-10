@@ -5,6 +5,10 @@ class RollupInspectBuilder {
   constructor(private config: RollupConfig) {}
 
   public build(): string {
+    if (!this.config || !this.config.rollupOptions) {
+      throw new Error('Invalid rollup configuration');
+    }
+
     const sourceView = escapeLiteral(this.config.rollupOptions.sourceView);
     const rollupView = escapeLiteral(this.config.rollupOptions.name);
 
@@ -41,7 +45,6 @@ class RollupUpBuilder {
           return `sum(${sourceColumn}) as ${targetColumn}`;
         case 'avg':
           return `avg(${sourceColumn}) as ${targetColumn}`;
-
         default:
           return `${rollup} as ${targetColumn}`;
       }
@@ -49,11 +52,13 @@ class RollupUpBuilder {
 
     const sourceView = escapeIdentifier(this.config.rollupOptions.sourceView);
     const bucketInterval = escapeLiteral(this.config.rollupOptions.bucketInterval);
-    const bucketColumn = escapeIdentifier('bucket'); // Assuming 'bucket' is standard
+
+    const sourceBucketColumn = escapeIdentifier(this.config.rollupOptions?.bucketColumn?.source);
+    const targetBucketColumn = escapeIdentifier(this.config.rollupOptions?.bucketColumn?.target);
 
     return `
       SELECT
-        time_bucket(${bucketInterval}, ${bucketColumn}) AS ${bucketColumn},
+        time_bucket(${bucketInterval}, ${sourceBucketColumn}) AS ${targetBucketColumn},
         ${rollupSelects.join(',\n        ')}
       FROM ${sourceView}
       GROUP BY 1 WITH ${this.config.rollupOptions.materializedOnly ? '' : 'NO '}DATA;
@@ -102,7 +107,11 @@ class RollupDownBuilder {
 }
 
 export class RollupBuilder {
-  constructor(private config: RollupConfig) {}
+  constructor(private config: RollupConfig) {
+    if (!config || !config.rollupOptions) {
+      throw new Error('Invalid rollup configuration');
+    }
+  }
 
   public up(): RollupUpBuilder {
     return new RollupUpBuilder(this.config);

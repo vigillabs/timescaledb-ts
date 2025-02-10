@@ -84,6 +84,18 @@ exports[`RollupBuilder up() refresh policy should properly escape interval value
     );"
 `;
 
+exports[`RollupBuilder up() should create with a different bucket column 1`] = `
+"CREATE MATERIALIZED VIEW "daily_rollup"
+      WITH (timescaledb.continuous) AS 
+      SELECT
+        time_bucket('1 day', "some_bucket") AS "some_bucket",
+        rollup(percentile_hourly) as "percentile_daily",
+        sum("total_hourly") as "total_daily"
+      FROM "hourly_metrics"
+      GROUP BY 1 WITH NO DATA;
+    "
+`;
+
 exports[`RollupBuilder up() should generate SQL with materialized-only option 1`] = `
 "CREATE MATERIALIZED VIEW "daily_rollup"
       WITH (timescaledb.continuous) AS 

@@ -15,6 +15,10 @@ describe('RollupBuilder', () => {
       },
     },
     rollupOptions: {
+      bucketColumn: {
+        source: 'bucket',
+        target: 'bucket',
+      },
       name: 'daily_rollup',
       sourceView: 'hourly_metrics',
       bucketInterval: '1 day',
@@ -87,6 +91,22 @@ describe('RollupBuilder', () => {
               targetColumn: 'percentile"daily',
             },
           ],
+        },
+      };
+      const builder = new RollupBuilder(config);
+      const sql = builder.up().build();
+      expect(sql).toMatchSnapshot();
+    });
+
+    it('should create with a different bucket column', () => {
+      const config = {
+        ...baseConfig,
+        rollupOptions: {
+          ...baseConfig.rollupOptions,
+          bucketColumn: {
+            source: 'some_bucket',
+            target: 'some_bucket',
+          },
         },
       };
       const builder = new RollupBuilder(config);
