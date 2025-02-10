@@ -6,6 +6,7 @@ import { AggregateColumn } from '../src/decorators/AggregateColumn';
 import { RollupColumn } from '../src/decorators/RollupColumn';
 import { Entity, PrimaryColumn } from 'typeorm';
 import { AggregateType } from '@timescaledb/schemas';
+import { ROLLUP_METADATA_KEY } from '../src/decorators/Rollup';
 
 describe('Rollup Decorator', () => {
   it('should throw error when bucket column is missing in rollup', () => {
@@ -105,67 +106,43 @@ describe('Rollup Decorator', () => {
     }).toThrow('Rollup bucket column must reference a bucket column from the source view');
   });
 
-  it('should throw error when multiple bucket columns are defined in rollup', () => {
-    // Define source entity
-    @Entity('metrics')
-    class Metric {
+  it('should verify source model type by checking metadata', () => {
+    // Create a mock source model class with rollup metadata
+    @Entity('source')
+    class SourceWithRollup {
       @PrimaryColumn()
       id!: number;
-
-      @PrimaryColumn({ type: 'timestamp' })
-      time!: Date;
-
-      @PrimaryColumn()
-      value!: number;
     }
 
-    // Define source continuous aggregate
-    @ContinuousAggregate(Metric, {
-      name: 'hourly_metrics',
-      bucket_interval: '1 hour',
-    })
-    class HourlyMetrics {
-      @BucketColumn({
-        source_column: 'time',
-      })
-      hour!: Date;
+    // Add rollup metadata to simulate it being a rollup view
+    Reflect.defineMetadata(
+      ROLLUP_METADATA_KEY,
+      {
+        isRollup: true,
+        sourceModel: {},
+        options: {},
+        rollupConfig: {},
+      },
+      SourceWithRollup,
+    );
 
-      @AggregateColumn({
-        type: AggregateType.Count,
-      })
-      total!: number;
-    }
-
-    // Attempt to create rollup with multiple bucket columns
     expect(() => {
-      @Rollup(HourlyMetrics, {
-        name: 'daily_metrics',
+      @Rollup(SourceWithRollup, {
+        name: 'another_rollup',
         bucket_interval: '1 day',
       })
-      class DailyMetrics {
+      class InvalidRollup {
         @BucketColumn({
-          source_column: 'hour',
+          source_column: 'time',
         })
         day!: Date;
-
-        @BucketColumn({
-          source_column: 'hour',
-        })
-        month!: Date;
-
-        @RollupColumn({
-          type: AggregateType.Sum,
-          source_column: 'total',
-        })
-        daily_total!: number;
       }
 
-      new DailyMetrics();
-    }).toThrow('Only one @BucketColumn is allowed per continuous aggregate');
+      new InvalidRollup();
+    }).toThrow('Multi-level rollups are not supported');
   });
 
   it('should work with valid bucket column configuration', () => {
-    // Define source entity
     @Entity('metrics')
     class Metric {
       @PrimaryColumn()
@@ -178,7 +155,6 @@ describe('Rollup Decorator', () => {
       value!: number;
     }
 
-    // Define source continuous aggregate
     @ContinuousAggregate(Metric, {
       name: 'hourly_metrics',
       bucket_interval: '1 hour',
@@ -195,7 +171,6 @@ describe('Rollup Decorator', () => {
       total!: number;
     }
 
-    // Define valid rollup
     expect(() => {
       @Rollup(HourlyMetrics, {
         name: 'daily_metrics',

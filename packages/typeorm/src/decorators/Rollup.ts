@@ -1,4 +1,3 @@
-/// <reference types="reflect-metadata" />
 import { getMetadataArgsStorage, ViewEntity } from 'typeorm';
 import { CreateContinuousAggregateOptions, RollupConfig } from '@timescaledb/schemas';
 import { BUCKET_COLUMN_METADATA_KEY, validateBucketColumn } from './BucketColumn';
@@ -19,24 +18,48 @@ export interface RollupMetadata {
   targetBucketColumn: string;
 }
 
+function validateSourceModel(sourceModel: Function) {
+  if (Reflect.getMetadata(ROLLUP_METADATA_KEY, sourceModel)) {
+    throw new Error('Multi-level rollups are not supported. The source model is already a rollup view.');
+  }
+
+  const sourceMetadata = getMetadataArgsStorage().tables.find((table) => table.target === sourceModel);
+  return sourceMetadata;
+}
+
+function validateSourceModelMetadata(metadata: any) {
+  if (!metadata) {
+    throw new Error('Source model is not a TypeORM entity');
+  }
+  return metadata;
+}
+
+function validateSourceBucketColumn(sourceModel: Function, bucketMetadata: { source_column: string }) {
+  const sourceBucketMetadata = Reflect.getMetadata(BUCKET_COLUMN_METADATA_KEY, sourceModel);
+
+  if (!sourceBucketMetadata) {
+    throw new Error('Source model must have a bucket column');
+  }
+
+  if (bucketMetadata.source_column !== sourceBucketMetadata.propertyKey.toString()) {
+    throw new Error('Rollup bucket column must reference a bucket column from the source view');
+  }
+
+  return sourceBucketMetadata;
+}
+
 export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Function, options: RollupOptions) {
   return function (target: T): T {
+    const sourceMetadata = validateSourceModelMetadata(validateSourceModel(sourceModel));
+
     const targetBucketMetadata = validateBucketColumn(target);
-    validateSourceBucketColumn(sourceModel, {
+    const sourceBucketMetadata = validateSourceBucketColumn(sourceModel, {
       source_column: targetBucketMetadata.source_column,
     });
-
-    const sourceBucketMetadata = validateBucketColumn(sourceModel);
-
-    const sourceMetadata = getMetadataArgsStorage().tables.find((table) => table.target === sourceModel);
-    if (!sourceMetadata) {
-      throw new Error('Source model is not a TypeORM entity');
-    }
 
     const rollupColumns = Reflect.getMetadata(ROLLUP_COLUMN_METADATA_KEY, target) || {};
 
     const rollupConfig: RollupConfig = {
-      // @ts-ignore
       continuousAggregateOptions: {
         ...options,
         name: options.name,
@@ -76,18 +99,4 @@ export function Rollup<T extends { new (...args: any[]): any }>(sourceModel: Fun
       synchronize: false,
     })(target) as T;
   };
-}
-
-function validateSourceBucketColumn(sourceModel: Function, bucketMetadata: { source_column: string }) {
-  // Get bucket column metadata from source model
-  const sourceBucketMetadata = Reflect.getMetadata(BUCKET_COLUMN_METADATA_KEY, sourceModel);
-
-  if (!sourceBucketMetadata) {
-    throw new Error('Source model must have a bucket column');
-  }
-
-  // Check if the rollup's bucket column references the source's bucket column
-  if (bucketMetadata.source_column !== sourceBucketMetadata.propertyKey.toString()) {
-    throw new Error('Rollup bucket column must reference a bucket column from the source view');
-  }
 }
