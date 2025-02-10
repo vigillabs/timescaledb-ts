@@ -205,6 +205,74 @@ const hourlyStats = await AppDataSource.getRepository(HourlyPageViews)
   .getMany();
 ```
 
+## Rollups
+
+Rollups let you aggregate data from continuous aggregates into longer time intervals (e.g., roll up hourly statistics into daily summaries).
+
+### Usage
+
+First, define your source continuous aggregate:
+
+```typescript
+import { ContinuousAggregate, BucketColumn, AggregateColumn } from '@timescaledb/typeorm';
+
+@ContinuousAggregate(PageLoad, {
+  name: 'hourly_page_views',
+  bucket_interval: '1 hour',
+})
+export class HourlyPageViews {
+  @BucketColumn({
+    source_column: 'time',
+  })
+  bucket!: Date;
+
+  @AggregateColumn({
+    type: 'count',
+  })
+  total_views!: number;
+}
+```
+
+Then define your rollup:
+
+```typescript
+import { Rollup, RollupColumn, BucketColumn } from '@timescaledb/typeorm';
+
+@Rollup(HourlyPageViews, {
+  name: 'daily_page_stats',
+  bucket_interval: '1 day',
+  refresh_policy: {
+    start_offset: '30 days',
+    end_offset: '1 day',
+    schedule_interval: '1 day',
+  },
+})
+export class DailyPageStats {
+  @BucketColumn({
+    source_column: 'bucket',
+  })
+  bucket!: Date;
+
+  @RollupColumn({
+    type: 'sum',
+    source_column: 'total_views',
+  })
+  daily_total!: number;
+}
+```
+
+Query the rollup:
+
+```typescript
+const stats = await AppDataSource.getRepository(DailyPageStats)
+  .createQueryBuilder()
+  .where('bucket >= :start', { start })
+  .andWhere('bucket < :end', { end })
+  .getMany();
+```
+
+The library automatically handles rollup creation and updates during migrations.
+
 ## Candlesticks
 
 Use a Hypertable to define a time-series table, then use the `getCandlesticks` method on the repository to query candlestick data:
