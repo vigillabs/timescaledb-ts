@@ -101,6 +101,8 @@ exports[`RollupBuilder up() should generate SQL with multiple rollup rules 1`] =
       WITH (timescaledb.continuous) AS 
       SELECT
         time_bucket('1 day', "bucket") AS "bucket",
+        rollup(percentile_hourly) as "percentile_daily",
+        sum("total_hourly") as "total_daily",
         rollup(percentile_hourly) as "percentile_daily"
       FROM "hourly_metrics"
       GROUP BY 1 WITH NO DATA;

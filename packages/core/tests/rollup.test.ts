@@ -61,6 +61,7 @@ describe('RollupBuilder', () => {
         rollupOptions: {
           ...baseConfig.rollupOptions,
           rollupRules: [
+            ...baseConfig.rollupOptions.rollupRules,
             {
               rollupFn: RollupFunctionType.Rollup,
               sourceColumn: 'percentile_hourly',
