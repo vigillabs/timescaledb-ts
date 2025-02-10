@@ -209,6 +209,10 @@ const hourlyStats = await AppDataSource.getRepository(HourlyPageViews)
 
 Rollups let you aggregate data from continuous aggregates into longer time intervals (e.g., roll up hourly statistics into daily summaries).
 
+See:
+
+- https://docs.timescale.com/use-timescale/latest/continuous-aggregates/hierarchical-continuous-aggregates/
+
 ### Usage
 
 First, define your source continuous aggregate:
