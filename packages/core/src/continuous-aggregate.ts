@@ -76,6 +76,17 @@ class ContinuousAggregateUpBuilder {
 
         return `time_bucket(${interval}, ${bucketColumn}) as ${alias}`;
       }
+      case 'candlestick': {
+        if (!config.time_column || !config.price_column) {
+          throw new Error('time_column and price_column are required for candlestick aggregate');
+        }
+        const args = [config.time_column, config.price_column];
+        if (config.volume_column) {
+          args.push(config.volume_column);
+        }
+
+        return `candlestick_agg(${args.map(escapeIdentifier).join(', ')}) as ${alias}`;
+      }
       default:
         throw new Error(`Unsupported aggregate type: ${config.type}`);
     }
@@ -84,18 +95,14 @@ class ContinuousAggregateUpBuilder {
   private generateSelect(): string {
     const sourceName = escapeIdentifier(this.source);
 
-    const aggregates = Object.entries(this.options.aggregates || [])
-      .map(([, config]) => {
-        return config.type === AggregateType.Bucket ? false : this.generateAggregate(config);
-      })
-      .filter(Boolean) as string[];
+    const hasGroupByColumns = [] as string[];
+    const aggregates = [] as string[];
 
     const bucketAggregate = Object.entries(this.options.aggregates || []).find(
       ([, config]) => config.type === AggregateType.Bucket,
     );
 
     const bucketColumnAlias = escapeIdentifier(bucketAggregate?.[1].column_alias || 'bucket');
-
     const generatedBucketStr = bucketAggregate
       ? this.generateAggregate(bucketAggregate[1])
       : this.generateAggregate({
@@ -104,11 +111,26 @@ class ContinuousAggregateUpBuilder {
           column_alias: 'bucket',
         });
 
+    aggregates.push(generatedBucketStr);
+    hasGroupByColumns.push(bucketColumnAlias);
+
+    const primaryColumns = this.options.group_columns || [];
+    primaryColumns.forEach((column) => {
+      const columnName = escapeIdentifier(column);
+      aggregates.push(`${columnName} as ${columnName}`);
+      hasGroupByColumns.push(columnName);
+    });
+
+    Object.entries(this.options.aggregates || []).forEach(([, config]) => {
+      if (config.type === AggregateType.Bucket) return;
+      aggregates.push(this.generateAggregate(config));
+    });
+
     return `
       SELECT
-        ${[generatedBucketStr, ...aggregates].join(',\n        ')}
+        ${aggregates.join(',\n      ')}
       FROM ${sourceName}
-      GROUP BY ${bucketColumnAlias}
+      GROUP BY ${hasGroupByColumns.join(', ')}
     `;
   }
 

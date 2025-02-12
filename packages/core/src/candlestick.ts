@@ -28,7 +28,7 @@ export class CandlestickAggregateBuilder {
 
   public build({ where, range }: { where?: WhereClause; range?: TimeRange } = {}): { sql: string; params: any[] } {
     const tableName = escapeIdentifier(this.tableName);
-    const timeColumn = escapeIdentifier(this.options.time_column);
+    const timeColumn = escapeIdentifier(this.options.time_column!);
     const priceColumn = escapeIdentifier(this.options.price_column);
     const volumeColumn = this.options.volume_column ? escapeIdentifier(this.options.volume_column) : null;
     const interval = '$1::interval';
@@ -91,5 +91,41 @@ export class CandlestickAggregateBuilder {
       sql: this.statements.join('\n'),
       params,
     };
+  }
+}
+
+export interface CandlestickMetadata {
+  propertyName: string;
+  timeColumn?: string;
+  priceColumn?: string;
+  volumeColumn?: string;
+  sourceColumn?: string;
+}
+
+export class CandlestickBuilder {
+  static generateSQL(metadata: CandlestickMetadata, isRollup: boolean = false): string {
+    if (!metadata) return '';
+
+    const targetColumn = escapeIdentifier(metadata.propertyName);
+
+    if (isRollup) {
+      if (!metadata.sourceColumn) {
+        throw new Error('source_column must be specified for candlestick rollups');
+      }
+      const sourceColumn = escapeIdentifier(metadata.sourceColumn);
+      return `rollup(${sourceColumn}) as ${targetColumn}`;
+    }
+
+    if (!metadata.timeColumn || !metadata.priceColumn) {
+      throw new Error('time_column and price_column must be specified for candlestick aggregation');
+    }
+
+    const args = [escapeIdentifier(metadata.timeColumn), escapeIdentifier(metadata.priceColumn)];
+
+    if (metadata.volumeColumn) {
+      args.push(escapeIdentifier(metadata.volumeColumn));
+    }
+
+    return `candlestick_agg(${args.join(', ')}) as ${targetColumn}`;
   }
 }

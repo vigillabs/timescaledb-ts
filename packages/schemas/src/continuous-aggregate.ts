@@ -8,6 +8,7 @@ export enum AggregateType {
   Min = 'min',
   Max = 'max',
   Bucket = 'bucket',
+  Candlestick = 'candlestick',
 }
 export const AggregateTypeSchema = z.nativeEnum(AggregateType);
 
@@ -15,6 +16,9 @@ export const AggregateColumnOptionsSchema = z.object({
   type: AggregateTypeSchema,
   column: z.string().optional(),
   column_alias: z.string().optional(),
+  time_column: z.string().optional(),
+  price_column: z.string().optional(),
+  volume_column: z.string().optional(),
 });
 export type AggregateColumnOptions = z.infer<typeof AggregateColumnOptionsSchema>;
 
@@ -31,6 +35,7 @@ export const CreateContinuousAggregateOptionsSchema = z
     time_column: z.string().optional(),
     refresh_policy: RefreshPolicySchema.optional(),
     aggregates: z.record(AggregateColumnOptionsSchema).optional(),
+    group_columns: z.array(z.string()).optional(),
   })
   .strict();
 

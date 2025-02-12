@@ -22,6 +22,7 @@ If you are looking to setup this project locally, you can follow the instruction
 
 - [Getting Started](./docs/guides/getting-started.md) - A guide to getting started with TimescaleDB and this library.
 - [Working with Energy Data](./docs/guides/energy-data.md) - A guide to working with energy data in TimescaleDB.
+- [Working with Candlesticks](./docs/guides/candlesticks.md) - A guide to working with candlestick data in TimescaleDB.
 
 ## Feature Compatibility
 
@@ -66,7 +67,7 @@ Then you can use the `@Hypertable` decorator to define your hypertables:
 
 ```diff
 import { Entity, PrimaryColumn } from 'typeorm';
-+ import { Hypertable } from '@timescaledb/typeorm';
++ import { Hypertable, TimeColumn } from '@timescaledb/typeorm';
 
 + @Hypertable({ ... })
 @Entity('page_loads')
@@ -74,7 +75,7 @@ export class PageLoad {
   @PrimaryColumn({ type: 'varchar' })
   user_agent!: string;
 
-  @PrimaryColumn({ type: 'timestamp' })
++  @TimeColumn()
   time!: Date;
 }
 ```

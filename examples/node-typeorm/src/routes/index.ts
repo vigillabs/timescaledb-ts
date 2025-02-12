@@ -5,6 +5,8 @@ import { HourlyPageViews } from '../models/HourlyPageViews';
 import { StockPrice } from '../models/StockPrice';
 import { WhereClauseSchema } from '@timescaledb/schemas';
 import { DailyPageStats } from '../models/DailyPageStats';
+import { StockPrice1H } from '../models/candlesticks/StockPrice1H';
+import { StockPrice1M } from '../models/candlesticks/StockPrice1M';
 
 const router = Router();
 
@@ -116,7 +118,6 @@ router.get('/candlestick', async (req, res) => {
     const candlesticks = await repository.getCandlesticks({
       timeRange: { start, end },
       config: {
-        time_column: 'timestamp',
         price_column: 'price',
         volume_column: 'volume',
         bucket_interval: '1 hour',
@@ -128,6 +129,70 @@ router.get('/candlestick', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Failed to get candlestick data' });
+  }
+});
+
+router.get('/candlestick/1m', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+    const symbol = req.query.symbol as string;
+
+    const repository = AppDataSource.getRepository(StockPrice1M);
+    const query = repository
+      .createQueryBuilder()
+      .where('bucket >= :start', { start })
+      .andWhere('bucket < :end', { end });
+
+    if (symbol) {
+      query.andWhere('symbol = :symbol', { symbol });
+    }
+
+    const candlesticks = await query.getMany();
+
+    const formattedData = candlesticks.map((c) => ({
+      bucket_time: c.bucket,
+      symbol: c.symbol,
+      ...c.candlestick,
+    }));
+
+    res.json(formattedData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get 1-minute candlestick data' });
+  }
+});
+
+router.get('/candlestick/1h', async (req, res) => {
+  try {
+    const start = new Date(req.query.start as string);
+    const end = new Date(req.query.end as string);
+    const symbol = req.query.symbol as string;
+
+    const repository = AppDataSource.getRepository(StockPrice1H);
+    const query = repository
+      .createQueryBuilder()
+      .where('bucket >= :start', { start })
+      .andWhere('bucket < :end', { end });
+
+    if (symbol) {
+      query.andWhere('symbol = :symbol', { symbol });
+    }
+
+    query.orderBy('bucket', 'ASC');
+
+    const candlesticks = await query.getMany();
+
+    const formattedData = candlesticks.map((c) => ({
+      bucket_time: c.bucket,
+      symbol: c.symbol,
+      ...c.candlestick,
+    }));
+
+    res.json(formattedData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to get 1-hour candlestick data' });
   }
 });
 
