@@ -1,5 +1,5 @@
 import '@timescaledb/typeorm';
-import { DataSource } from 'typeorm';
+import { DataSource, SimpleConsoleLogger } from 'typeorm';
 import { PageLoad } from './models/PageLoad';
 
 import dotenv from 'dotenv';
@@ -14,8 +14,8 @@ dotenv.config();
 export const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
+  logger: new SimpleConsoleLogger(false),
   synchronize: false,
-  logging: process.env.NODE_ENV === 'development',
   entities: [PageLoad, HourlyPageViews, StockPrice, DailyPageStats, StockPrice1M, StockPrice1H],
   migrations: ['migrations/*.ts'],
 });

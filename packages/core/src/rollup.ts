@@ -2,6 +2,10 @@ import { RollupConfig, RollupRule } from '@timescaledb/schemas';
 import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
 import { CandlestickBuilder, CandlestickMetadata } from './candlestick';
 
+import { debugCore } from './debug';
+
+const debug = debugCore('RollupBuilder');
+
 export interface RollupMetadata {
   candlestick?: CandlestickMetadata;
   rollupRules: Array<RollupRule>;
@@ -11,6 +15,8 @@ class RollupInspectBuilder {
   constructor(private config: RollupConfig) {}
 
   public build(): string {
+    debug(`Building inspect query for rollup '${this.config.rollupOptions.name}'`);
+
     if (!this.config || !this.config.rollupOptions) {
       throw new Error('Invalid rollup configuration 1');
     }
@@ -18,7 +24,7 @@ class RollupInspectBuilder {
     const sourceView = escapeLiteral(this.config.rollupOptions.sourceView);
     const rollupView = escapeLiteral(this.config.rollupOptions.name);
 
-    return `
+    const result = `
       SELECT 
         EXISTS (
           SELECT FROM information_schema.views 
@@ -31,6 +37,10 @@ class RollupInspectBuilder {
           AND table_name = ${rollupView}
         ) as rollup_view_exists;
     `;
+
+    debug(`Inspect query '${this.config.rollupOptions.name}' built:\n${result}`);
+
+    return result;
   }
 }
 
@@ -85,15 +95,19 @@ class RollupUpBuilder {
     const groupByCols = ['1', ...groupColumns.map((c) => escapeIdentifier(c))];
     const groupByClause = groupByCols.join(', ');
 
-    return `
+    const result = `
       SELECT
         ${selectStatements.join(',\n      ')}
       FROM ${sourceView}
       GROUP BY ${groupByClause}${this.config.rollupOptions.materializedOnly ? ' WITH ' : ' WITH NO '}DATA;
     `;
+
+    return result;
   }
 
   public build(metadata?: RollupMetadata): string {
+    debug('Building rollup query');
+
     const _metadata = metadata || ({ rollupRules: this.config.rollupOptions.rollupRules || [] } as RollupMetadata);
     const viewName = escapeIdentifier(this.config.rollupOptions.name);
     this.statements.push(
@@ -101,20 +115,27 @@ class RollupUpBuilder {
       WITH (timescaledb.continuous) AS ${this.buildRollupSelect(_metadata)}`,
     );
 
+    debug(`Rollup query built:\n${this.statements.join('\n')}`);
+
     return this.statements.join('\n');
   }
 
   public getRefreshPolicy(): string | null {
     if (!this.config.rollupOptions.refresh_policy) return null;
+    debug('Building refresh policy query');
 
     const policy = this.config.rollupOptions.refresh_policy;
     const viewName = escapeLiteral(this.config.rollupOptions.name);
 
-    return `SELECT add_continuous_aggregate_policy(${viewName},
+    const result = `SELECT add_continuous_aggregate_policy(${viewName},
       start_offset => INTERVAL ${escapeLiteral(policy.start_offset)},
       end_offset => INTERVAL ${escapeLiteral(policy.end_offset)},
       schedule_interval => INTERVAL ${escapeLiteral(policy.schedule_interval)}
     );`;
+
+    debug(`Refresh policy query built:\n${result}`);
+
+    return result;
   }
 }
 
@@ -122,6 +143,8 @@ class RollupDownBuilder {
   constructor(private config: RollupConfig) {}
 
   public build(): string[] {
+    debug('Building down query');
+
     const statements: string[] = [];
     const viewName = this.config.rollupOptions.name;
 
@@ -130,6 +153,8 @@ class RollupDownBuilder {
     }
 
     statements.push(`DROP MATERIALIZED VIEW IF EXISTS ${escapeIdentifier(viewName)};`);
+
+    debug(`Down query built:\n${statements.join('\n')}`);
 
     return statements;
   }

@@ -10,6 +10,9 @@ import { ROLLUP_METADATA_KEY, RollupMetadata } from '../decorators/Rollup';
 import { CANDLESTICK_COLUMN_METADATA_KEY, CandlestickColumnMetadata } from '../decorators/CandlestickColumn';
 import { ROLLUP_COLUMN_METADATA_KEY } from '../decorators/RollupColumn';
 import { TIME_COLUMN_METADATA_KEY, TimeColumnMetadata } from '../decorators/TimeColumn';
+import { debugTypeOrm } from '../debug';
+
+const debug = debugTypeOrm('migration');
 
 const originalRunMigrations = DataSource.prototype.runMigrations;
 const originalUndoLastMigration = DataSource.prototype.undoLastMigration;
@@ -17,6 +20,8 @@ const originalSynchronize = DataSource.prototype.synchronize;
 const originalInitialize = DataSource.prototype.initialize;
 
 DataSource.prototype.initialize = async function () {
+  debug('Initializing TimescaleDB');
+
   const connection = await originalInitialize.call(this);
 
   for (const entity of this.entityMetadatas) {
@@ -30,16 +35,22 @@ DataSource.prototype.initialize = async function () {
     }
   }
 
+  debug('TimescaleDB initialized');
+
   return connection;
 };
 
 async function setupTimescaleExtension(dataSource: DataSource) {
+  debug('Setting up TimescaleDB extension');
+
   try {
     const extension = TimescaleDB.createExtension();
     await dataSource.query(extension.up().build());
 
     await dataSource.query('CREATE EXTENSION IF NOT EXISTS timescaledb_toolkit;');
   } catch (error) {
+    debug('Error setting up TimescaleDB extension:', error);
+
     if (
       !(error as Error).message.includes('extension "timescaledb" already exists') &&
       !(error as Error).message.includes('extension "timescaledb_toolkit" already exists')
@@ -50,9 +61,13 @@ async function setupTimescaleExtension(dataSource: DataSource) {
 }
 
 DataSource.prototype.runMigrations = async function (options?: { transaction?: 'all' | 'none' | 'each' }) {
+  debug('Running migrations');
+
   const migrations = await originalRunMigrations.call(this, options);
 
   await setupTimescaleObjects(this);
+
+  debug('Migrations complete');
 
   return migrations;
 };
@@ -72,6 +87,8 @@ DataSource.prototype.synchronize = async function (dropBeforeSync: boolean = fal
 };
 
 async function setupHypertables(dataSource: DataSource) {
+  debug('Setting up hypertables');
+
   const entities = dataSource.entityMetadatas;
 
   for await (const entity of entities) {
@@ -82,12 +99,16 @@ async function setupHypertables(dataSource: DataSource) {
       const hypertableCheck = await dataSource.query(hypertable.inspect().build());
 
       if (!hypertableCheck[0].table_exists) {
+        debug(`Table ${entity.tableName} does not exist, skipping hypertable setup`);
         continue;
       }
 
       if (hypertableCheck[0].is_hypertable) {
+        debug(`Hypertable for ${entity.tableName} already exists`);
         continue;
       }
+
+      debug(`Setting up hypertable for ${entity.tableName}`);
 
       await dataSource.query(hypertable.up().build());
 
@@ -95,9 +116,13 @@ async function setupHypertables(dataSource: DataSource) {
       Object.assign(repository, timescaleMethods);
     }
   }
+
+  debug('Hypertables setup');
 }
 
 async function removeHypertables(dataSource: DataSource) {
+  debug('Removing hypertables');
+
   const entities = dataSource.entityMetadatas;
 
   for await (const entity of entities) {
@@ -108,10 +133,13 @@ async function removeHypertables(dataSource: DataSource) {
       const hypertableCheck = await dataSource.query(hypertable.inspect().build());
 
       if (!hypertableCheck[0].is_hypertable) {
+        debug(`Table ${entity.tableName} is not a hypertable, skipping removal`);
         continue;
       }
 
       await dataSource.query(hypertable.down().build());
+
+      debug(`Hypertable for ${entity.tableName} removed`);
     }
   }
 }
@@ -129,6 +157,8 @@ async function setupTimescaleObjects(dataSource: DataSource) {
 }
 
 async function removeContinuousAggregates(dataSource: DataSource) {
+  debug('Removing continuous aggregates');
+
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
@@ -148,8 +178,12 @@ async function removeContinuousAggregates(dataSource: DataSource) {
     const statements = aggregate.down().build();
     for (const sql of statements) {
       await dataSource.query(sql);
+
+      debug(`Continuous aggregate for ${entity.tableName} removed`);
     }
   }
+
+  debug('Continuous aggregates removed');
 }
 
 async function removeTimescaleObjects(dataSource: DataSource) {
@@ -185,6 +219,8 @@ async function validateAggregateColumns(dataSource: DataSource) {
 }
 
 async function setupContinuousAggregates(dataSource: DataSource) {
+  debug('Setting up continuous aggregates');
+
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
@@ -202,7 +238,10 @@ async function setupContinuousAggregates(dataSource: DataSource) {
     const sourceHypertable = TimescaleDB.createHypertable(sourceTableName, sourceOptions);
 
     const hypertableCheck = await dataSource.query(sourceHypertable.inspect().build());
-    if (!hypertableCheck[0].is_hypertable) continue;
+    if (!hypertableCheck[0].is_hypertable) {
+      debug(`Source table ${sourceTableName} is not a hypertable, skipping continuous aggregate setup`);
+      continue;
+    }
 
     await validateAggregateColumns(dataSource);
 
@@ -212,7 +251,9 @@ async function setupContinuousAggregates(dataSource: DataSource) {
       (Reflect.getMetadata(AGGREGATE_COLUMN_METADATA_KEY, entity.target) as Record<string, AggregateColumnOptions>);
 
     if (!aggregateColumns) {
-      throw new Error('No aggregates defined for continuous aggregate');
+      const error = `No aggregates defined for continuous aggregate ${entity.tableName}`;
+      debug(error);
+      throw new Error(error);
     }
 
     // @ts-ignore
@@ -262,10 +303,16 @@ async function setupContinuousAggregates(dataSource: DataSource) {
         await dataSource.query(refreshPolicy);
       }
     }
+
+    debug(`Continuous aggregate for ${entity.tableName} set up`);
   }
+
+  debug('Continuous aggregates setup');
 }
 
 async function setupRollups(dataSource: DataSource) {
+  debug('Setting up rollups');
+
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
@@ -279,14 +326,12 @@ async function setupRollups(dataSource: DataSource) {
     const inspectResults = await dataSource.query(builder.inspect().build());
 
     if (!inspectResults[0].source_view_exists) {
-      console.warn(
-        `Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`,
-      );
+      debug(`Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`);
       continue;
     }
 
     if (inspectResults[0].rollup_view_exists) {
-      console.log(`Rollup view ${entity.tableName} already exists, skipping creation`);
+      debug(`Rollup view ${entity.tableName} already exists, skipping creation`);
       continue;
     }
 
@@ -317,14 +362,12 @@ async function setupRollups(dataSource: DataSource) {
       const inspectResults = await dataSource.query(builder.inspect().build());
 
       if (!inspectResults[0].source_view_exists) {
-        console.warn(
-          `Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`,
-        );
+        debug(`Source view ${rollupConfig.rollupOptions.sourceView} does not exist for rollup ${entity.tableName}`);
         continue;
       }
 
       if (inspectResults[0].rollup_view_exists) {
-        console.log(`Rollup view ${entity.tableName} already exists, skipping creation`);
+        debug(`Rollup view ${entity.tableName} already exists, skipping creation`);
         continue;
       }
 
@@ -340,17 +383,22 @@ async function setupRollups(dataSource: DataSource) {
         await dataSource.query(refreshPolicy);
       }
     } catch (error) {
-      console.error(`Failed to setup rollup for ${entity.tableName}:`, error);
+      debug(`Failed to setup rollup for ${entity.tableName}:`, error);
       throw error;
     }
+
     const refreshPolicy = builder.up().getRefreshPolicy();
     if (refreshPolicy) {
       await dataSource.query(refreshPolicy);
     }
+
+    debug(`Rollup for ${entity.tableName} set up`);
   }
 }
 
 async function removeRollups(dataSource: DataSource) {
+  debug('Removing rollups');
+
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
@@ -364,11 +412,17 @@ async function removeRollups(dataSource: DataSource) {
 
     for (const sql of statements) {
       await dataSource.query(sql);
+
+      debug(`Rollup for ${entity.tableName} removed`);
     }
   }
+
+  debug('Rollups removed');
 }
 
 async function setupTimeColumns(dataSource: DataSource) {
+  debug('Setting up time columns');
+
   const entities = dataSource.entityMetadatas;
 
   for (const entity of entities) {
@@ -380,4 +434,6 @@ async function setupTimeColumns(dataSource: DataSource) {
       await dataSource.query(checkSql);
     }
   }
+
+  debug('Time columns setup');
 }

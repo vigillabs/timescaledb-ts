@@ -1,5 +1,8 @@
 import { CreateExtensionOptions, CreateExtensionOptionsSchema } from '@timescaledb/schemas';
 import { ExtensionErrors } from './errors';
+import { debugCore } from './debug';
+
+const debug = debugCore('Extension');
 
 class ExtensionUpBuilder {
   private options?: CreateExtensionOptions;
@@ -10,10 +13,13 @@ class ExtensionUpBuilder {
   }
 
   public build(): string {
+    debug('Building up query for timescaledb extension');
     const stmt = `CREATE EXTENSION IF NOT EXISTS timescaledb${this?.options?.should_cascade ? ' CASCADE' : ''};`;
     this.statements.push(stmt);
 
-    return this.statements.join('\n');
+    const result = this.statements.join('\n');
+    debug(`Up query built:\n${result}`);
+    return result;
   }
 }
 
@@ -26,10 +32,13 @@ class ExtensionDownBuilder {
   }
 
   public build(): string {
+    debug('Building down query for timescaledb extension');
     const stmt = `DROP EXTENSION IF EXISTS timescaledb${this?.options?.should_cascade ? ' CASCADE' : ''};`;
     this.statements.push(stmt);
 
-    return this.statements.join('\n');
+    const result = this.statements.join('\n');
+    debug(`Down query built:\n${result}`);
+    return result;
   }
 }
 
@@ -40,8 +49,10 @@ export class Extension {
     if (options) {
       try {
         this.options = CreateExtensionOptionsSchema.parse(options);
+        debug('Extension options validated successfully');
       } catch (error) {
         const e = error as Error;
+        debug('Invalid extension options:', e);
         throw new Error(ExtensionErrors.INVALID_OPTIONS + ' ' + e.message);
       }
     }

@@ -5,17 +5,24 @@ import {
   CreateContinuousAggregateOptionsSchema,
 } from '@timescaledb/schemas';
 import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
+import { debugCore } from './debug';
+
+const debug = debugCore('ContinuousAggregate');
 
 class ContinuousAggregateInspectBuilder {
   constructor(private name: string) {}
 
   public build(): string {
+    debug(`Building inspect query for continuous aggregate '${this.name}'`);
     const literalName = escapeLiteral(this.name);
 
-    return `SELECT EXISTS (
+    const result = `SELECT EXISTS (
       SELECT FROM timescaledb_information.continuous_aggregates
       WHERE view_name = ${literalName}
     ) as hypertable_exists;`;
+
+    debug(`Inspect query built for '${this.name}':\n${result}`);
+    return result;
   }
 }
 
@@ -126,29 +133,39 @@ class ContinuousAggregateUpBuilder {
       aggregates.push(this.generateAggregate(config));
     });
 
-    return `
+    const result = `
       SELECT
         ${aggregates.join(',\n      ')}
       FROM ${sourceName}
       GROUP BY ${hasGroupByColumns.join(', ')}
     `;
+
+    return result;
   }
 
   public getRefreshPolicy(): string | null {
     if (!this.options.refresh_policy) return null;
 
+    debug(`Building refresh policy for continuous aggregate '${this.name}'`);
     const policy = this.options.refresh_policy;
     const viewName = escapeLiteral(this.name);
-    return `SELECT add_continuous_aggregate_policy(${viewName},
+    const result = `SELECT add_continuous_aggregate_policy(${viewName},
       start_offset => INTERVAL ${escapeLiteral(policy.start_offset)},
       end_offset => INTERVAL ${escapeLiteral(policy.end_offset)},
       schedule_interval => INTERVAL ${escapeLiteral(policy.schedule_interval)}
     );`;
+
+    debug(`Refresh policy built for '${this.name}':\n${result}`);
+    return result;
   }
 
   public build(): string {
+    debug(`Building up query for continuous aggregate '${this.name}'`);
     const viewName = escapeIdentifier(this.name);
-    return `CREATE MATERIALIZED VIEW ${viewName} WITH (timescaledb.continuous) AS ${this.generateSelect()} WITH NO DATA;`;
+    const result = `CREATE MATERIALIZED VIEW ${viewName} WITH (timescaledb.continuous) AS ${this.generateSelect()} WITH NO DATA;`;
+
+    debug(`Up query built for '${this.name}':\n${result}`);
+    return result;
   }
 }
 
@@ -159,6 +176,7 @@ class ContinuousAggregateDownBuilder {
   ) {}
 
   public build(): string[] {
+    debug(`Building down query for continuous aggregate '${this.name}'`);
     const statements: string[] = [];
     const viewName = this.name;
 
@@ -168,6 +186,7 @@ class ContinuousAggregateDownBuilder {
 
     statements.push(`DROP MATERIALIZED VIEW IF EXISTS ${escapeIdentifier(viewName)};`);
 
+    debug(`Down query built for '${this.name}':\n${statements.join('\n')}`);
     return statements;
   }
 }
