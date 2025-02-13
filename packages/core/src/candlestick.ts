@@ -5,6 +5,9 @@ import {
   WhereClause,
 } from '@timescaledb/schemas';
 import { buildWhereClause, escapeIdentifier } from '@timescaledb/utils';
+import { debugCore } from './debug';
+
+const debug = debugCore('Candlestick');
 
 export class CandlestickAggregateBuilder {
   private statements: string[] = [];
@@ -22,11 +25,11 @@ export class CandlestickAggregateBuilder {
     }
 
     const { sql, params } = buildWhereClause(where, paramOffset);
-
     return { sql: ` AND ${sql}`, params };
   }
 
   public build({ where, range }: { where?: WhereClause; range?: TimeRange } = {}): { sql: string; params: any[] } {
+    debug(`Building candlestick query for table '${this.tableName}'`);
     const tableName = escapeIdentifier(this.tableName);
     const timeColumn = escapeIdentifier(this.options.time_column!);
     const priceColumn = escapeIdentifier(this.options.price_column);
@@ -87,10 +90,13 @@ export class CandlestickAggregateBuilder {
     this.statements.push(`GROUP BY bucket_time`);
     this.statements.push(`ORDER BY bucket_time ASC;`);
 
-    return {
+    const result = {
       sql: this.statements.join('\n'),
       params,
     };
+
+    debug(`Candlestick query built for '${this.tableName}':\n${result.sql}`);
+    return result;
   }
 }
 
@@ -104,19 +110,25 @@ export interface CandlestickMetadata {
 
 export class CandlestickBuilder {
   static generateSQL(metadata: CandlestickMetadata, isRollup: boolean = false): string {
+    debug(`Generating SQL for candlestick ${isRollup ? 'rollup' : 'aggregation'}`);
+
     if (!metadata) return '';
 
     const targetColumn = escapeIdentifier(metadata.propertyName);
 
     if (isRollup) {
       if (!metadata.sourceColumn) {
+        debug('Error: source_column missing for rollup');
         throw new Error('source_column must be specified for candlestick rollups');
       }
       const sourceColumn = escapeIdentifier(metadata.sourceColumn);
-      return `rollup(${sourceColumn}) as ${targetColumn}`;
+      const result = `rollup(${sourceColumn}) as ${targetColumn}`;
+      debug(`Generated rollup SQL: ${result}`);
+      return result;
     }
 
     if (!metadata.timeColumn || !metadata.priceColumn) {
+      debug('Error: required columns missing for aggregation');
       throw new Error('time_column and price_column must be specified for candlestick aggregation');
     }
 
@@ -126,6 +138,8 @@ export class CandlestickBuilder {
       args.push(escapeIdentifier(metadata.volumeColumn));
     }
 
-    return `candlestick_agg(${args.join(', ')}) as ${targetColumn}`;
+    const result = `candlestick_agg(${args.join(', ')}) as ${targetColumn}`;
+    debug(`Generated aggregation SQL: ${result}`);
+    return result;
   }
 }

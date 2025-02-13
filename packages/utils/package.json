@@ -35,6 +35,7 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@timescaledb/schemas": "workspace:^"
+    "@timescaledb/schemas": "workspace:^",
+    "debug": "^4.4.0"
   }
 }

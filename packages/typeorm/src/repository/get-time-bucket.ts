@@ -2,6 +2,9 @@ import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { Repository, ObjectLiteral } from 'typeorm';
 import { TimescaleDB } from '@timescaledb/core';
 import { TimeBucketConfig, TimeBucketConfigSchema, TimeBucketOptions } from '@timescaledb/schemas';
+import { debugTypeOrm } from '../debug';
+
+const debug = debugTypeOrm('getTimeBucket');
 
 export async function getTimeBucket<T extends ObjectLiteral>(
   this: Repository<T>,
@@ -13,9 +16,13 @@ export async function getTimeBucket<T extends ObjectLiteral>(
   }>
 > {
   const target = this.target as Function;
+  debug(`Getting time bucket for ${target.name}`);
+
   const hypertableOptions = Reflect.getMetadata(HYPERTABLE_METADATA_KEY, target);
 
   if (!hypertableOptions) {
+    const error = 'Entity is not a hypertable';
+    debug(error);
     throw new Error(`Entity is not a hypertable`);
   }
 
@@ -41,7 +48,7 @@ export async function getTimeBucket<T extends ObjectLiteral>(
   });
   const results = await this.query(sql, params);
 
-  return results.map((row: any) => {
+  const result = results.map((row: any) => {
     const formattedRow: { [key: string]: number | string } = {
       interval: row.interval,
     };
@@ -53,4 +60,8 @@ export async function getTimeBucket<T extends ObjectLiteral>(
 
     return formattedRow;
   });
+
+  debug('Time bucket retrieved');
+
+  return result;
 }

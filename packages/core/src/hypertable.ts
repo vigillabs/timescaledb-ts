@@ -3,6 +3,9 @@ import { HypertableErrors } from './errors';
 import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
 import { CompressionBuilder } from './compression';
 import { TimeBucketBuilder } from './time-bucket';
+import { debugCore } from './debug';
+
+const debug = debugCore('Hypertable');
 
 class HypertableUpBuilder {
   private options: CreateHypertableOptions;
@@ -15,6 +18,7 @@ class HypertableUpBuilder {
   }
 
   public build(): string {
+    debug(`Building up query for hypertable '${this.name}'`);
     const tableName = escapeIdentifier(this.name);
 
     this.statements.push(
@@ -39,7 +43,9 @@ class HypertableUpBuilder {
       }
     }
 
-    return this.statements.join('\n');
+    const result = this.statements.join('\n');
+    debug(`Up query built for '${this.name}':\n${result}`);
+    return result;
   }
 }
 
@@ -54,6 +60,7 @@ class HypertableDownBuilder {
   }
 
   public build(): string {
+    debug(`Building down query for hypertable '${this.name}'`);
     const tableName = escapeIdentifier(this.name);
     const literalName = escapeLiteral(this.name);
 
@@ -67,7 +74,9 @@ class HypertableDownBuilder {
 
     this.statements.push(`SELECT drop_chunks(${literalName}, NOW()::timestamp without time zone);`);
 
-    return this.statements.join('\n');
+    const result = this.statements.join('\n');
+    debug(`Down query built for '${this.name}':\n${result}`);
+    return result;
   }
 }
 
@@ -80,6 +89,7 @@ export class HypertableInspectBuilder {
   }
 
   public build(): string {
+    debug(`Building inspect query for hypertable '${this.name}'`);
     const literalName = escapeLiteral(this.name);
 
     this.statements.push('SELECT');
@@ -95,7 +105,9 @@ export class HypertableInspectBuilder {
     WHERE hypertable_name = ${literalName}
   ) AS is_hypertable`);
 
-    return this.statements.join('\n');
+    const result = this.statements.join('\n');
+    debug(`Inspect query built for '${this.name}':\n${result}`);
+    return result;
   }
 }
 

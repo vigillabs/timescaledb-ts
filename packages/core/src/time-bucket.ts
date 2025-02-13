@@ -1,5 +1,8 @@
 import { MetricConfig, TimeBucketConfig, TimeRange, WhereClause } from '@timescaledb/schemas';
 import { buildWhereClause, escapeIdentifier } from '@timescaledb/utils';
+import { debugCore } from './debug';
+
+const debug = debugCore('TimeBucketBuilder');
 
 export class TimeBucketBuilder {
   private statements: string[] = [];
@@ -46,6 +49,8 @@ export class TimeBucketBuilder {
   }
 
   public build({ where, range }: { where?: WhereClause; range: TimeRange }): { sql: string; params: any[] } {
+    debug(`Building time bucket query for table '${this.tableName}'`);
+
     if (!range) {
       throw new Error('TimeRange is required');
     }
@@ -93,9 +98,13 @@ export class TimeBucketBuilder {
     this.statements.push(metricAliases.join(',\n'));
     this.statements.push(`FROM time_buckets;`);
 
-    return {
+    const result = {
       sql: this.statements.join('\n'),
       params: this.params,
     };
+
+    debug(`Time bucket query for '${this.tableName}' built\n-SQL:${result.sql}\n-Params:${this.params}`);
+
+    return result;
   }
 }

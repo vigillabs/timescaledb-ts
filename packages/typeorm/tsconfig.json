@@ -19,7 +19,8 @@
     "baseUrl": ".",
     "paths": {
       "@timescaledb/core": ["../core/dist"],
-      "@timescaledb/schemas": ["../schemas/dist"]
+      "@timescaledb/schemas": ["../schemas/dist"],
+      "@timescaledb/utils": ["../utils/dist"]
     }
   },
   "include": ["src"],

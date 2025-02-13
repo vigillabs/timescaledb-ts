@@ -1,9 +1,11 @@
 import { CompressionSelect, CompressionSelectSchema, CreateHypertableOptions } from '@timescaledb/schemas';
 import { escapeLiteral } from '@timescaledb/utils';
+import { debugCore } from './debug';
+
+const debug = debugCore('Compression');
 
 class CompressionStatsBuilder {
   private statements: string[] = [];
-
   private name: string;
   private options: CompressionSelect;
 
@@ -13,6 +15,7 @@ class CompressionStatsBuilder {
   }
 
   public build(): string {
+    debug(`Building compression stats query for '${this.name}'`);
     this.statements.push(`SELECT`);
 
     const columns: string[] = [];
@@ -32,10 +35,11 @@ class CompressionStatsBuilder {
     }
 
     const literalName = escapeLiteral(this.name);
-
     this.statements.push(`FROM hypertable_compression_stats(${literalName});`);
 
-    return this.statements.join('\n');
+    const result = this.statements.join('\n');
+    debug(`Compression stats query built for '${this.name}':\n${result}`);
+    return result;
   }
 }
 

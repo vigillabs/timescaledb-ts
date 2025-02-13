@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@timescaledb/core": "workspace:^",
+    "@timescaledb/utils": "workspace:^",
     "@timescaledb/schemas": "workspace:^",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"

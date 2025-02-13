@@ -26,6 +26,9 @@ importers:
       '@jest/globals':
         specifier: 29.7.0
         version: 29.7.0
+      '@types/debug':
+        specifier: ^4.1.12
+        version: 4.1.12
       '@types/express':
         specifier: 5.0.0
         version: 5.0.0
@@ -184,6 +187,9 @@ importers:
       '@timescaledb/schemas':
         specifier: workspace:^
         version: link:../schemas
+      '@timescaledb/utils':
+        specifier: workspace:^
+        version: link:../utils
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -196,6 +202,9 @@ importers:
       '@timescaledb/schemas':
         specifier: workspace:^
         version: link:../schemas
+      debug:
+        specifier: ^4.4.0
+        version: 4.4.0
 
 packages:
 
