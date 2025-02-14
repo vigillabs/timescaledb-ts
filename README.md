@@ -2,9 +2,9 @@
 
 [![npm version](https://badge.fury.io/js/@timescaledb%2Ftypeorm.svg)](https://badge.fury.io/js/@timescaledb%2Ftypeorm) [![Tests](https://github.com/timescale/timescaledb-ts/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/timescale/timescaledb-ts/actions/workflows/test.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<p>
-  <img src="docs/images/banner-dark.png#gh-dark-mode-only" alt="pgai"/>
-  <img src="docs/images/banner-white.png#gh-light-mode-only" alt="pgai"/>
+<p align=center>
+  <img width="80%" src="docs/images/banner-dark.png#gh-dark-mode-only" alt="pgai"/>
+  <img width="80%" src="docs/images/banner-white.png#gh-light-mode-only" alt="pgai"/>
 </p>
 
 <div align=center>
