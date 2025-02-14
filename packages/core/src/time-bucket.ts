@@ -35,6 +35,9 @@ export class TimeBucketBuilder {
         case 'sum':
           this.metricStatements.push(`SUM(${column}) as ${escapeIdentifier(alias)}`);
           break;
+        case 'avg':
+          this.metricStatements.push(`AVG(${column}) as ${escapeIdentifier(alias)}`);
+          break;
         default:
           throw new Error(`Unsupported metric type: ${metric.type}`);
       }

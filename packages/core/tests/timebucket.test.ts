@@ -55,6 +55,26 @@ describe('TimeBucket', () => {
       expect({ sql, params }).toMatchSnapshot();
     });
 
+    it('should generate query with avg metric', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'avg',
+              column: 'value',
+              alias: 'average_value',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+    });
+
     it('should generate query with distinct count metric', () => {
       const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
       const { sql, params } = hypertable
