@@ -1,8 +1,15 @@
 {
   "name": "@timescaledb/utils",
   "version": "0.0.0-alpha.4",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
   "homepage": "https://github.com/timescale/timescaledb-ts",
   "repository": {
     "type": "git",
