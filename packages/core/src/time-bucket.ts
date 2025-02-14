@@ -32,6 +32,9 @@ export class TimeBucketBuilder {
         case 'distinct_count':
           this.metricStatements.push(`COUNT(DISTINCT ${column}) as ${escapeIdentifier(alias)}`);
           break;
+        case 'sum':
+          this.metricStatements.push(`SUM(${column}) as ${escapeIdentifier(alias)}`);
+          break;
         default:
           throw new Error(`Unsupported metric type: ${metric.type}`);
       }
