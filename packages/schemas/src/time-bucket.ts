@@ -3,7 +3,16 @@ import { ByRangeSchema } from './by-range';
 import { TimeRange } from './time-range';
 import { WhereClause } from './where';
 
-export const TimeBucketMetricTypeSchema = z.enum(['count', 'distinct_count']);
+export const TimeBucketMetricTypeSchema = z.enum([
+  'count',
+  'distinct_count',
+  'sum',
+  'avg',
+  'min',
+  'max',
+  'first',
+  'last',
+]);
 export type TimeBucketMetricType = z.infer<typeof TimeBucketMetricTypeSchema>;
 
 export const MetricConfigSchema = z.object({
