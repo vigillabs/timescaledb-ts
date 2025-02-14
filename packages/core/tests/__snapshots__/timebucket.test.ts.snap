@@ -69,6 +69,29 @@ FROM time_buckets;",
 }
 `;
 
+exports[`TimeBucket build should generate query with first metric 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    FIRST("value") as "first_value"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "first_value" as "first_value"
+FROM time_buckets;",
+}
+`;
+
 exports[`TimeBucket build should generate query with interval 1 day 1`] = `
 {
   "interval": "1 day",
@@ -185,6 +208,75 @@ exports[`TimeBucket build should generate query with interval 1 week 1`] = `
 SELECT
   TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
   "total_count" as "total_count"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with last metric 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    LAST("value") as "last_value"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "last_value" as "last_value"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with max metric 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    MAX("value") as "max_value"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "max_value" as "max_value"
+FROM time_buckets;",
+}
+`;
+
+exports[`TimeBucket build should generate query with min metric 1`] = `
+{
+  "params": [
+    "1 hour",
+    2025-01-01T00:00:00.000Z,
+    2025-01-02T00:00:00.000Z,
+  ],
+  "sql": "WITH time_buckets AS (
+  SELECT
+    time_bucket($1::interval, "time") AS interval,
+    MIN("value") as "min_value"
+  FROM "my_table"
+  WHERE "time" >= $2 AND "time" <= $3
+  GROUP BY interval
+  ORDER BY interval DESC
+)
+SELECT
+  TO_CHAR(interval, 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as interval,
+  "min_value" as "min_value"
 FROM time_buckets;",
 }
 `;

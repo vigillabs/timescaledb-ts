@@ -38,6 +38,23 @@ export class TimeBucketBuilder {
         case 'avg':
           this.metricStatements.push(`AVG(${column}) as ${escapeIdentifier(alias)}`);
           break;
+
+        case 'min':
+          this.metricStatements.push(`MIN(${column}) as ${escapeIdentifier(alias)}`);
+          break;
+
+        case 'max':
+          this.metricStatements.push(`MAX(${column}) as ${escapeIdentifier(alias)}`);
+          break;
+
+        case 'first':
+          this.metricStatements.push(`FIRST(${column}) as ${escapeIdentifier(alias)}`);
+          break;
+
+        case 'last':
+          this.metricStatements.push(`LAST(${column}) as ${escapeIdentifier(alias)}`);
+          break;
+
         default:
           throw new Error(`Unsupported metric type: ${metric.type}`);
       }

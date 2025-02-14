@@ -95,6 +95,86 @@ describe('TimeBucket', () => {
       expect({ sql, params }).toMatchSnapshot();
     });
 
+    it('should generate query with min metric', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'min',
+              column: 'value',
+              alias: 'min_value',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+    });
+
+    it('should generate query with max metric', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'max',
+              column: 'value',
+              alias: 'max_value',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+    });
+
+    it('should generate query with first metric', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'first',
+              column: 'value',
+              alias: 'first_value',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+    });
+
+    it('should generate query with last metric', () => {
+      const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
+      const { sql, params } = hypertable
+        .timeBucket({
+          interval: '1 hour',
+          metrics: [
+            {
+              type: 'last',
+              column: 'value',
+              alias: 'last_value',
+            },
+          ],
+        })
+        .build({
+          range: timeRange,
+        });
+
+      expect({ sql, params }).toMatchSnapshot();
+    });
+
     it('should generate query with multiple metrics', () => {
       const hypertable = TimescaleDB.createHypertable('my_table', defaultOptions);
       const { sql, params } = hypertable
