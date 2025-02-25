@@ -22,8 +22,8 @@ const originalInitialize = DataSource.prototype.initialize;
 const eligibleEntityMetadatas = (entityMetadatas: EntityMetadata[]) => {
   return entityMetadatas.filter((entity) => {
     return typeof entity.target !== 'string';
-  })
-}
+  });
+};
 
 DataSource.prototype.initialize = async function () {
   debug('Initializing TimescaleDB');
