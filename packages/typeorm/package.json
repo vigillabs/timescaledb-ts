@@ -32,13 +32,6 @@
   "bugs": {
     "url": "https://github.com/timescale/timescaledb-ts/issues"
   },
-  "typesVersions": {
-    "*": {
-      "*": [
-        "src/*"
-      ]
-    }
-  },
   "files": [
     "dist"
   ],
