@@ -1,6 +1,6 @@
 {
   "name": "@timescaledb/monorepo",
-  "version": "0.0.0-alpha.7",
+  "version": "0.0.0-alpha.8",
   "packageManager": "pnpm@9.15.3",
   "scripts": {
     "lint": "eslint .",
