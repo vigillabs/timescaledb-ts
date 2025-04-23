@@ -46,11 +46,6 @@ if (!version) {
   process.exit(1);
 }
 
-if (!version.includes('alpha')) {
-  console.error('Please set the VERSION environment variable to an alpha version.');
-  process.exit(1);
-}
-
 if (!startPath) {
   console.error('Please set the START_PATH environment variable.');
   process.exit(1);
