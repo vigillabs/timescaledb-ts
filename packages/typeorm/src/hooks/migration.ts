@@ -109,14 +109,15 @@ async function setupHypertables(dataSource: DataSource) {
         continue;
       }
 
-      if (hypertableCheck[0].is_hypertable) {
-        debug(`Hypertable for ${entity.tableName} already exists`);
-        continue;
-      }
+      // Allow redundant hypertables for now
+      // if (hypertableCheck[0].is_hypertable) {
+      //   debug(`Hypertable for ${entity.tableName} already exists`);
+      //   continue;
+      // }
 
       debug(`Setting up hypertable for ${entity.tableName}`);
 
-      await dataSource.query(hypertable.up().build());
+      await dataSource.query(hypertable.up().build(true));
 
       const repository = dataSource.getRepository(entity.target);
       Object.assign(repository, timescaleMethods);

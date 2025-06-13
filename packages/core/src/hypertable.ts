@@ -21,13 +21,15 @@ class HypertableUpBuilder {
     this.options = options;
   }
 
-  public build(): string {
+  public build(isHypertable: boolean = false): string {
     debug(`Building up query for hypertable '${this.name}'`);
     const tableName = escapeIdentifier(this.name);
 
-    this.statements.push(
-      `SELECT create_hypertable(${escapeLiteral(this.name)}, by_range(${escapeLiteral(this.options.by_range.column_name)}));`,
-    );
+    if (!isHypertable) {
+      this.statements.push(
+        `SELECT create_hypertable(${escapeLiteral(this.name)}, by_range(${escapeLiteral(this.options.by_range.column_name)}));`,
+      );
+    }
 
     if (this.options.compression?.compress) {
       const orderBy = escapeIdentifier(this.options.compression.compress_orderby);
