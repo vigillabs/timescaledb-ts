@@ -3,8 +3,8 @@ import {
   AggregateType,
   CreateContinuousAggregateOptions,
   CreateContinuousAggregateOptionsSchema,
-} from '@vigillabs/timescale-db/schemas';
-import { escapeIdentifier, escapeLiteral } from '@vigillabs/timescale-db/utils';
+} from '@timescaledb/schemas';
+import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
 import { debugCore } from './debug';
 
 const debug = debugCore('ContinuousAggregate');

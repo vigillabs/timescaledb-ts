@@ -1,4 +1,4 @@
-import { Candlestick } from '@vigillabs/timescale-db/schemas';
+import { Candlestick } from '@timescaledb/schemas';
 import { debugTypeOrm } from '../debug';
 
 const debug = debugTypeOrm('parseCandlestick');

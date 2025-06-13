@@ -4,14 +4,14 @@ import {
   CreateExtensionOptions,
   CreateHypertableOptions,
   RollupConfig,
-} from '@vigillabs/timescale-db/schemas';
+} from '@timescaledb/schemas';
 import { Hypertable } from './hypertable';
 import { Extension } from './extension';
 import { ContinuousAggregate } from './continuous-aggregate';
 import { CandlestickAggregateBuilder } from './candlestick';
 import { RollupBuilder } from './rollup';
 
-export const name = '@vigillabs/timescale-db/core';
+export const name = '@timescaledb/core';
 
 export class TimescaleDB {
   public static Hypertable: Hypertable;

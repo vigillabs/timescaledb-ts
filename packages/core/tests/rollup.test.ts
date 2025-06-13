@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { RollupBuilder } from '../src/rollup';
-import { RollupConfig, RollupFunctionType, AggregateType } from '@vigillabs/timescale-db/schemas';
+import { RollupConfig, RollupFunctionType, AggregateType } from '@timescaledb/schemas';
 
 describe('RollupBuilder', () => {
   const baseConfig: RollupConfig = {

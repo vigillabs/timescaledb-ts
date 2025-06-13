@@ -3,7 +3,7 @@ import { ContinuousAggregate } from '../src/decorators/ContinuousAggregate';
 import { BucketColumn } from '../src/decorators/BucketColumn';
 import { AggregateColumn } from '../src/decorators/AggregateColumn';
 import { Entity, PrimaryColumn } from 'typeorm';
-import { AggregateType } from '@vigillabs/timescale-db/schemas';
+import { AggregateType } from '@timescaledb/schemas';
 
 describe('ContinuousAggregate Decorator', () => {
   it('should throw error when bucket column is missing', () => {

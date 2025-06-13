@@ -1,5 +1,5 @@
 import { ViewColumn } from 'typeorm';
-import { CandlestickColumnOptions } from '@vigillabs/timescale-db/schemas';
+import { CandlestickColumnOptions } from '@timescaledb/schemas';
 import { parseCandlestick } from '../utils/parse-candlestick';
 
 export const CANDLESTICK_COLUMN_METADATA_KEY = Symbol('timescale:candlestick-column');

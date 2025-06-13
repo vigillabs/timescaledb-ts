@@ -1,5 +1,5 @@
 {
-  "name": "@vigillabs/timescale-db/utils",
+  "name": "@timescaledb/utils",
   "version": "0.0.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -42,7 +42,7 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@vigillabs/timescale-db/schemas": "workspace:^",
+    "@timescaledb/schemas": "workspace:^",
     "debug": "^4.4.0"
   }
 }

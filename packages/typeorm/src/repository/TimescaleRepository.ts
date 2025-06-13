@@ -1,5 +1,5 @@
 import { Repository, ObjectLiteral } from 'typeorm';
-import { CandlesticksResult, CompressionStats, GetCandlesticksOptions, TimeBucketOptions } from '@vigillabs/timescale-db/schemas';
+import { CandlesticksResult, CompressionStats, GetCandlesticksOptions, TimeBucketOptions } from '@timescaledb/schemas';
 import { getCompressionStats } from './get-compression-stats';
 import { getTimeBucket } from './get-time-bucket';
 import { getCandlesticks } from './get-candlesticks';

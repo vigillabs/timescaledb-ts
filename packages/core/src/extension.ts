@@ -1,4 +1,4 @@
-import { CreateExtensionOptions, CreateExtensionOptionsSchema } from '@vigillabs/timescale-db/schemas';
+import { CreateExtensionOptions, CreateExtensionOptionsSchema } from '@timescaledb/schemas';
 import { ExtensionErrors } from './errors';
 import { debugCore } from './debug';
 

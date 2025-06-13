@@ -5,7 +5,7 @@ import { Rollup } from '../src/decorators/Rollup';
 import { AggregateColumn } from '../src/decorators/AggregateColumn';
 import { RollupColumn } from '../src/decorators/RollupColumn';
 import { Entity, PrimaryColumn } from 'typeorm';
-import { AggregateType } from '@vigillabs/timescale-db/schemas';
+import { AggregateType } from '@timescaledb/schemas';
 import { ROLLUP_METADATA_KEY } from '../src/decorators/Rollup';
 
 describe('Rollup Decorator', () => {

@@ -1,4 +1,4 @@
-import { debug } from '@vigillabs/timescale-db/utils';
+import { debug } from '@timescaledb/utils';
 
 const packageName = 'core';
 
