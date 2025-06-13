@@ -1,6 +1,6 @@
 import { Repository, ObjectLiteral } from 'typeorm';
-import { TimescaleDB } from '@timescaledb/core';
-import { GetCandlesticksOptions, CandlesticksResult } from '@timescaledb/schemas';
+import { TimescaleDB } from '@vigillabs/timescale-db/core';
+import { GetCandlesticksOptions, CandlesticksResult } from '@vigillabs/timescale-db/schemas';
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { TIME_COLUMN_METADATA_KEY, TimeColumnMetadata } from '../decorators/TimeColumn';
 import { debugTypeOrm } from '../debug';

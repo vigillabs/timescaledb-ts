@@ -1,6 +1,6 @@
 /// <reference types="reflect-metadata" />
 import { Column } from 'typeorm';
-import { AggregateColumnOptions } from '@timescaledb/schemas';
+import { AggregateColumnOptions } from '@vigillabs/timescale-db/schemas';
 
 export const ROLLUP_COLUMN_METADATA_KEY = Symbol('timescale:rollup-field');
 

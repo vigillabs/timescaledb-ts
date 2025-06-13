@@ -1,5 +1,5 @@
 {
-  "name": "@vigillabs/timescale-db",
+  "name": "@vigillabs/timescale-db/typeorm",
   "version": "0.0.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,19 +30,23 @@
   "author": "Timescale",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/timescale/timescaledb-ts/issues"
+    "url": "https://github.com/vigillabs/timescaledb-ts/issues"
   },
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc",
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@timescaledb/core": "workspace:^",
-    "@timescaledb/utils": "workspace:^",
-    "@timescaledb/schemas": "workspace:^",
+    "@vigillabs/timescale-db/core": "workspace:^",
+    "@vigillabs/timescale-db/utils": "workspace:^",
+    "@vigillabs/timescale-db/schemas": "workspace:^",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
   }

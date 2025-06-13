@@ -1,5 +1,5 @@
-import { RollupConfig, RollupRule } from '@timescaledb/schemas';
-import { escapeIdentifier, escapeLiteral } from '@timescaledb/utils';
+import { RollupConfig, RollupRule } from '@vigillabs/timescale-db/schemas';
+import { escapeIdentifier, escapeLiteral } from '@vigillabs/timescale-db/utils';
 import { CandlestickBuilder, CandlestickMetadata } from './candlestick';
 
 import { debugCore } from './debug';

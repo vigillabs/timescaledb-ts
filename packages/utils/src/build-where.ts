@@ -1,5 +1,5 @@
 import { escapeIdentifier } from './sql';
-import { WhereClause } from '@timescaledb/schemas';
+import { WhereClause } from '@vigillabs/timescale-db/schemas';
 
 export function buildWhereClause(where: WhereClause, startParamIndex: number = 1): { sql: string; params: any[] } {
   const conditions: string[] = [];

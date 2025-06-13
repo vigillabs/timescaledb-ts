@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { TimescaleDB } from '../src';
-import { CreateHypertableOptions } from '@timescaledb/schemas';
+import { CreateHypertableOptions } from '@vigillabs/timescale-db/schemas';
 
 describe('TimeBucket', () => {
   const defaultOptions: CreateHypertableOptions = {

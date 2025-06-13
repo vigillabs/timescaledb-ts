@@ -1,5 +1,4 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
     "lib": ["esnext"],
@@ -10,14 +9,15 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {
-      "@timescaledb/schemas": ["../schemas/dist"],
-      "@timescaledb/utils": ["../utils/dist"]
+      "@vigillabs/timescale-db/schemas": ["../schemas/dist"],
+      "@vigillabs/timescale-db/utils": ["../utils/dist"]
     }
   },
   "include": ["src"],

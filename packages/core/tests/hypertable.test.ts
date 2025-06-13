@@ -1,6 +1,6 @@
 import { describe, it } from '@jest/globals';
 import { TimescaleDB, HypertableErrors } from '../src';
-import { CreateHypertableOptions } from '@timescaledb/schemas';
+import { CreateHypertableOptions } from '@vigillabs/timescale-db/schemas';
 
 describe('Hypertable', () => {
   it('should fail when creating a hypertable without a name', () => {

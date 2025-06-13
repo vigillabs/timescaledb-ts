@@ -1,10 +1,10 @@
 import { DataSource, EntityMetadata, getMetadataArgsStorage } from 'typeorm';
-import { TimescaleDB, generateTimestamptzCheck } from '@timescaledb/core';
+import { TimescaleDB, generateTimestamptzCheck } from '@vigillabs/timescale-db/core';
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { timescaleMethods } from '../repository/TimescaleRepository';
 import { CONTINUOUS_AGGREGATE_METADATA_KEY, ContinuousAggregateMetadata } from '../decorators/ContinuousAggregate';
 import { AGGREGATE_COLUMN_METADATA_KEY } from '../decorators/AggregateColumn';
-import { AggregateColumnOptions, AggregateType } from '@timescaledb/schemas';
+import { AggregateColumnOptions, AggregateType } from '@vigillabs/timescale-db/schemas';
 import { validateBucketColumn } from '../decorators/BucketColumn';
 import { ROLLUP_METADATA_KEY, RollupMetadata } from '../decorators/Rollup';
 import { CANDLESTICK_COLUMN_METADATA_KEY, CandlestickColumnMetadata } from '../decorators/CandlestickColumn';

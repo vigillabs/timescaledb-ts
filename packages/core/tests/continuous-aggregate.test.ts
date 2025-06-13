@@ -1,6 +1,6 @@
 import { describe, it, expect } from '@jest/globals';
 import { TimescaleDB } from '../src';
-import { CreateContinuousAggregateOptions, AggregateType } from '@timescaledb/schemas';
+import { CreateContinuousAggregateOptions, AggregateType } from '@vigillabs/timescale-db/schemas';
 
 describe('ContinuousAggregate', () => {
   describe('aggregate functions', () => {
