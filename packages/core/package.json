@@ -1,6 +1,6 @@
 {
   "name": "@vigillabs/timescale-db-core",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -45,8 +45,8 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@vigillabs/timescale-db-schemas": "workspace:^",
-    "@vigillabs/timescale-db-utils": "workspace:^"
+    "@vigillabs/timescale-db-schemas": "^0.0.3",
+    "@vigillabs/timescale-db-utils": "^0.0.3"
   },
   "devDependencies": {}
 }
