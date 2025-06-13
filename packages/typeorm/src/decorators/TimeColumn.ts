@@ -7,17 +7,16 @@ export interface TimeColumnMetadata {
   columnName: string;
 }
 
-export function TimeColumn() {
+export function TimeColumn(options?: { name?: string }) {
   return function (target: any, propertyKey: string | symbol) {
     const metadata: TimeColumnMetadata = {
       propertyKey,
-      columnName: propertyKey.toString(),
+
+      Reflect.defineMetadata(TIME_COLUMN_METADATA_KEY, metadata, target.constructor);
+
+      PrimaryColumn({ type: 'timestamp with time zone' })(target, propertyKey);
+      PrimaryColumn({ type: 'timestamp with time zone', name: options?.name })(target, propertyKey);
     };
-
-    Reflect.defineMetadata(TIME_COLUMN_METADATA_KEY, metadata, target.constructor);
-
-    PrimaryColumn({ type: 'timestamp with time zone' })(target, propertyKey);
-  };
 }
 
 export function validateTimeColumn(target: Function): TimeColumnMetadata {
