@@ -3,7 +3,7 @@ import { AppDataSource } from '../data-source';
 import { PageLoad } from '../models/PageLoad';
 import { HourlyPageViews } from '../models/HourlyPageViews';
 import { StockPrice } from '../models/StockPrice';
-import { WhereClauseSchema } from '@timescaledb/schemas';
+import { WhereClauseSchema } from '@vigillabs/timescale-db-schemas';
 import { DailyPageStats } from '../models/DailyPageStats';
 import { StockPrice1H } from '../models/candlesticks/StockPrice1H';
 import { StockPrice1M } from '../models/candlesticks/StockPrice1M';

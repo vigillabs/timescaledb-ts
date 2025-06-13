@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn } from 'typeorm';
-import { Hypertable, TimeColumn } from '@timescaledb/typeorm';
+import { Hypertable, TimeColumn } from '@vigillabs/timescale-db-typeorm';
 
 @Entity('page_loads')
 @Hypertable({

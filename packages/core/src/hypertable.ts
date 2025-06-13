@@ -1,6 +1,10 @@
-import { CreateHypertableOptions, CreateHypertableOptionsSchema, TimeBucketConfig } from '@timescaledb/schemas';
+import {
+  CreateHypertableOptions,
+  CreateHypertableOptionsSchema,
+  TimeBucketConfig,
+} from '@vigillabs/timescale-db-schemas';
 import { HypertableErrors } from './errors';
-import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@timescaledb/utils';
+import { escapeIdentifier, escapeLiteral, validateIdentifier } from '@vigillabs/timescale-db-utils';
 import { CompressionBuilder } from './compression';
 import { TimeBucketBuilder } from './time-bucket';
 import { debugCore } from './debug';

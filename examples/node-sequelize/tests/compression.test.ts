@@ -4,7 +4,7 @@ import sequelize from '../src/database';
 import PageLoad from '../src/models/PageLoad';
 import { faker } from '@faker-js/faker';
 import { QueryTypes } from 'sequelize';
-import { CompressionStats } from '@timescaledb/schemas';
+import { CompressionStats } from '@vigillabs/timescale-db-schemas';
 
 describe('GET /api/compression', () => {
   beforeEach(async () => {

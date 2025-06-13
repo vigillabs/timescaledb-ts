@@ -1,8 +1,8 @@
 {
-  "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["esnext"],
+    "lib": ["es2020"],
+    "module": "commonjs",
     "allowJs": true,
     "sourceMap": true,
     "declaration": true,
@@ -15,7 +15,7 @@
     "noEmit": false,
     "outDir": "./dist",
     "paths": {
-      "@timescaledb/*": ["../*/src"]
+      "@vigillabs/timescale-db/*": ["../*/src"]
     }
   },
   "include": ["src"]

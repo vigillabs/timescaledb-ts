@@ -4,7 +4,7 @@ import { getPageViewStats, getCompressionStats, getCandlestickData } from '../se
 import HourlyPageView from '../models/HourlyPageView';
 import DailyPageStats from '../models/DailyPageStats';
 import { Op } from 'sequelize';
-import { WhereClauseSchema } from '@timescaledb/schemas';
+import { WhereClauseSchema } from '@vigillabs/timescale-db-schemas';
 
 const router = Router();
 

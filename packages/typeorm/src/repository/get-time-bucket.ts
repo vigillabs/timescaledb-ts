@@ -1,7 +1,7 @@
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { Repository, ObjectLiteral } from 'typeorm';
-import { TimescaleDB } from '@timescaledb/core';
-import { TimeBucketConfig, TimeBucketConfigSchema, TimeBucketOptions } from '@timescaledb/schemas';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
+import { TimeBucketConfig, TimeBucketConfigSchema, TimeBucketOptions } from '@vigillabs/timescale-db-schemas';
 import { debugTypeOrm } from '../debug';
 
 const debug = debugTypeOrm('getTimeBucket');

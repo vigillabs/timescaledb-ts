@@ -1,6 +1,6 @@
 import { Repository, ObjectLiteral } from 'typeorm';
-import { TimescaleDB } from '@timescaledb/core';
-import { CompressionStats } from '@timescaledb/schemas';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
+import { CompressionStats } from '@vigillabs/timescale-db-schemas';
 import { HYPERTABLE_METADATA_KEY } from '../decorators/Hypertable';
 import { debugTypeOrm } from '../debug';
 

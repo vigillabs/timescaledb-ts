@@ -1,5 +1,5 @@
 /// <reference types="reflect-metadata" />
-import { CreateContinuousAggregateOptions } from '@timescaledb/schemas';
+import { CreateContinuousAggregateOptions } from '@vigillabs/timescale-db-schemas';
 import { getMetadataArgsStorage, ViewEntity } from 'typeorm';
 import { AGGREGATE_COLUMN_METADATA_KEY } from './AggregateColumn';
 import { validateBucketColumn } from './BucketColumn';

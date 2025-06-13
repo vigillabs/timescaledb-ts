@@ -1,4 +1,4 @@
-import { TimescaleDB } from '@timescaledb/core';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
 
 export const StockPrices = TimescaleDB.createHypertable('stock_prices', {
   by_range: {

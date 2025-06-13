@@ -1,5 +1,5 @@
 import { getMetadataArgsStorage, ViewEntity } from 'typeorm';
-import { CreateContinuousAggregateOptions, RollupConfig } from '@timescaledb/schemas';
+import { CreateContinuousAggregateOptions, RollupConfig } from '@vigillabs/timescale-db-schemas';
 import { BUCKET_COLUMN_METADATA_KEY, validateBucketColumn } from './BucketColumn';
 import { ROLLUP_COLUMN_METADATA_KEY } from './RollupColumn';
 

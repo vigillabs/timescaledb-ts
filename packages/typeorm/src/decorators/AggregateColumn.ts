@@ -1,6 +1,6 @@
 /// <reference types="reflect-metadata" />
 import { ViewColumn } from 'typeorm';
-import { AggregateColumnOptions } from '@timescaledb/schemas';
+import { AggregateColumnOptions } from '@vigillabs/timescale-db-schemas';
 
 export const AGGREGATE_COLUMN_METADATA_KEY = Symbol('timescale:aggregate-field');
 

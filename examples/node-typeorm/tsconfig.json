@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "lib": ["esnext"],
+    "lib": ["es2020"],
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
@@ -12,7 +12,9 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "paths": {
-      "@timescaledb/*": ["../../packages/*/src"]
+      "@vigillabs/timescale-db-core": ["../../packages/core/dist"],
+      "@vigillabs/timescale-db-schemas": ["../../packages/schemas/dist"],
+      "@vigillabs/timescale-db-typeorm": ["../../packages/typeorm/dist"]
     }
   },
   "include": ["src", "migrations"],

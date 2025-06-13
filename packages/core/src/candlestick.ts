@@ -3,8 +3,8 @@ import {
   CandlestickAggregateOptionsSchema,
   TimeRange,
   WhereClause,
-} from '@timescaledb/schemas';
-import { buildWhereClause, escapeIdentifier } from '@timescaledb/utils';
+} from '@vigillabs/timescale-db-schemas';
+import { buildWhereClause, escapeIdentifier } from '@vigillabs/timescale-db-utils';
 import { debugCore } from './debug';
 
 const debug = debugCore('Candlestick');

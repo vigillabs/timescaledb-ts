@@ -1,5 +1,5 @@
 {
-  "name": "@timescaledb/core",
+  "name": "@vigillabs/timescale-db-core",
   "version": "0.0.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -10,10 +10,10 @@
       "require": "./dist/index.js"
     }
   },
-  "homepage": "https://github.com/timescale/timescaledb-ts",
+  "homepage": "https://github.com/vigillabs/timescaledb-ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/timescale/timescaledb-ts.git"
+    "url": "git+https://github.com/vigillabs/timescaledb-ts.git"
   },
   "keywords": [
     "timescaledb",
@@ -28,7 +28,7 @@
   "author": "Timescale",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/timescale/timescaledb-ts/issues"
+    "url": "https://github.com/vigillabs/timescaledb-ts/issues"
   },
   "typesVersions": {
     "*": {
@@ -45,8 +45,8 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@timescaledb/schemas": "workspace:^",
-    "@timescaledb/utils": "workspace:^"
+    "@vigillabs/timescale-db-schemas": "workspace:^",
+    "@vigillabs/timescale-db-utils": "workspace:^"
   },
   "devDependencies": {}
 }

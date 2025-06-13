@@ -1,5 +1,5 @@
-import { TimescaleDB } from '@timescaledb/core';
-import { AggregateType, RollupFunctionType } from '@timescaledb/schemas';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
+import { AggregateType, RollupFunctionType } from '@vigillabs/timescale-db-schemas';
 
 export const DailyPageStats = TimescaleDB.createRollup({
   continuousAggregateOptions: {

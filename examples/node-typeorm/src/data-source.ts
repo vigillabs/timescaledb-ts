@@ -1,4 +1,4 @@
-import '@timescaledb/typeorm';
+import '@vigillabs/timescale-db-typeorm';
 import { DataSource, SimpleConsoleLogger } from 'typeorm';
 import { PageLoad } from './models/PageLoad';
 

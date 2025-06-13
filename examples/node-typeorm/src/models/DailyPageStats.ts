@@ -1,6 +1,6 @@
-import { Rollup, BucketColumn, RollupColumn } from '@timescaledb/typeorm';
+import { Rollup, BucketColumn, RollupColumn } from '@vigillabs/timescale-db-typeorm';
 import { HourlyPageViews } from './HourlyPageViews';
-import { AggregateType } from '@timescaledb/schemas';
+import { AggregateType } from '@vigillabs/timescale-db-schemas';
 
 @Rollup(HourlyPageViews, {
   name: 'daily_page_stats',

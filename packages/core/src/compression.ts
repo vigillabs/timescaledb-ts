@@ -1,5 +1,5 @@
-import { CompressionSelect, CompressionSelectSchema, CreateHypertableOptions } from '@timescaledb/schemas';
-import { escapeLiteral } from '@timescaledb/utils';
+import { CompressionSelect, CompressionSelectSchema, CreateHypertableOptions } from '@vigillabs/timescale-db-schemas';
+import { escapeLiteral } from '@vigillabs/timescale-db-utils';
 import { debugCore } from './debug';
 
 const debug = debugCore('Compression');

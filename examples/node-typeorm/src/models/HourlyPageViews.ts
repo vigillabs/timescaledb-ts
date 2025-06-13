@@ -1,6 +1,6 @@
-import { ContinuousAggregate, AggregateColumn, BucketColumn } from '@timescaledb/typeorm';
+import { ContinuousAggregate, AggregateColumn, BucketColumn } from '@vigillabs/timescale-db-typeorm';
 import { PageLoad } from './PageLoad';
-import { AggregateType } from '@timescaledb/schemas';
+import { AggregateType } from '@vigillabs/timescale-db-schemas';
 
 @ContinuousAggregate(PageLoad, {
   name: 'hourly_page_views',

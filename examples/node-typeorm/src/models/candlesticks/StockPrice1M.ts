@@ -1,7 +1,7 @@
 import { PrimaryColumn } from 'typeorm';
-import { ContinuousAggregate, BucketColumn, CandlestickColumn } from '@timescaledb/typeorm';
+import { ContinuousAggregate, BucketColumn, CandlestickColumn } from '@vigillabs/timescale-db-typeorm';
 import { StockPrice } from '../StockPrice';
-import { Candlestick } from '@timescaledb/schemas';
+import { Candlestick } from '@vigillabs/timescale-db-schemas';
 
 @ContinuousAggregate(StockPrice, {
   name: 'stock_candlesticks_1m',

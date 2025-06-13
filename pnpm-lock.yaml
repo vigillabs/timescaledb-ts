@@ -110,10 +110,10 @@ importers:
 
   examples/node-sequelize:
     dependencies:
-      '@timescaledb/core':
+      '@vigillabs/timescale-db-core':
         specifier: workspace:^
         version: link:../../packages/core
-      '@timescaledb/schemas':
+      '@vigillabs/timescale-db-schemas':
         specifier: workspace:^
         version: link:../../packages/schemas
       express:
@@ -144,13 +144,13 @@ importers:
 
   examples/node-typeorm:
     dependencies:
-      '@timescaledb/core':
+      '@vigillabs/timescale-db-core':
         specifier: workspace:^
         version: link:../../packages/core
-      '@timescaledb/schemas':
+      '@vigillabs/timescale-db-schemas':
         specifier: workspace:^
         version: link:../../packages/schemas
-      '@timescaledb/typeorm':
+      '@vigillabs/timescale-db-typeorm':
         specifier: workspace:^
         version: link:../../packages/typeorm
       express:
@@ -169,10 +169,10 @@ importers:
 
   packages/core:
     dependencies:
-      '@timescaledb/schemas':
+      '@vigillabs/timescale-db-schemas':
         specifier: workspace:^
         version: link:../schemas
-      '@timescaledb/utils':
+      '@vigillabs/timescale-db-utils':
         specifier: workspace:^
         version: link:../utils
 
@@ -184,13 +184,13 @@ importers:
 
   packages/typeorm:
     dependencies:
-      '@timescaledb/core':
+      '@vigillabs/timescale-db-core':
         specifier: workspace:^
         version: link:../core
-      '@timescaledb/schemas':
+      '@vigillabs/timescale-db-schemas':
         specifier: workspace:^
         version: link:../schemas
-      '@timescaledb/utils':
+      '@vigillabs/timescale-db-utils':
         specifier: workspace:^
         version: link:../utils
       reflect-metadata:
@@ -202,7 +202,7 @@ importers:
 
   packages/utils:
     dependencies:
-      '@timescaledb/schemas':
+      '@vigillabs/timescale-db-schemas':
         specifier: workspace:^
         version: link:../schemas
       debug:

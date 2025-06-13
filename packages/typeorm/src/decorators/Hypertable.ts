@@ -1,5 +1,5 @@
 /// <reference types="reflect-metadata" />
-import { CreateHypertableOptions } from '@timescaledb/schemas';
+import { CreateHypertableOptions } from '@vigillabs/timescale-db-schemas';
 import { timescaleMethods } from '../repository/TimescaleRepository';
 import { validateTimeColumn } from './TimeColumn';
 

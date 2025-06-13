@@ -1,5 +1,5 @@
 {
-  "name": "@timescaledb/monorepo",
+  "name": "@vigillabs/timescale-db",
   "version": "0.0.1",
   "packageManager": "pnpm@9.15.3",
   "scripts": {

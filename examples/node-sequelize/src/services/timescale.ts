@@ -1,9 +1,9 @@
 import sequelize from '../database';
 import { PageViewStats } from '../types';
-import { CompressionStats, TimeRange, WhereClause } from '@timescaledb/schemas';
+import { CompressionStats, TimeRange, WhereClause } from '@vigillabs/timescale-db-schemas';
 import { PageLoads } from '../../config/PageLoads';
 import { QueryTypes } from 'sequelize';
-import { TimescaleDB } from '@timescaledb/core';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
 
 export async function getPageViewStats({
   range,

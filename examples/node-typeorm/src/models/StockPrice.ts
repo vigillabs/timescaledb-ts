@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column } from 'typeorm';
-import { Hypertable, TimeColumn } from '@timescaledb/typeorm';
+import { Hypertable, TimeColumn } from '@vigillabs/timescale-db-typeorm';
 
 @Entity('stock_prices')
 @Hypertable({

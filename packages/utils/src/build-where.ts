@@ -1,5 +1,5 @@
 import { escapeIdentifier } from './sql';
-import { WhereClause } from '@timescaledb/schemas';
+import { WhereClause } from '@vigillabs/timescale-db-schemas';
 
 export function buildWhereClause(where: WhereClause, startParamIndex: number = 1): { sql: string; params: any[] } {
   const conditions: string[] = [];
@@ -9,7 +9,12 @@ export function buildWhereClause(where: WhereClause, startParamIndex: number = 1
   for (const [column, condition] of Object.entries(where)) {
     const escapedColumn = escapeIdentifier(column);
 
-    if (typeof condition === 'object' && !Array.isArray(condition) && !(condition instanceof Date)) {
+    if (
+      typeof condition === 'object' &&
+      condition !== null &&
+      !Array.isArray(condition) &&
+      !(condition instanceof Date)
+    ) {
       for (const [operator, value] of Object.entries(condition)) {
         if (Array.isArray(value) && (operator === 'IN' || operator === 'NOT IN')) {
           const placeholders = value.map(() => `$${paramIndex++}`).join(', ');

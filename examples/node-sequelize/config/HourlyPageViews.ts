@@ -1,5 +1,5 @@
-import { TimescaleDB } from '@timescaledb/core';
-import { AggregateType } from '@timescaledb/schemas';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
+import { AggregateType } from '@vigillabs/timescale-db-schemas';
 
 export const HourlyPageViews = TimescaleDB.createContinuousAggregate('hourly_page_views', 'page_loads', {
   bucket_interval: '1 hour',

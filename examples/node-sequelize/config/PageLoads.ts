@@ -1,4 +1,4 @@
-import { TimescaleDB } from '@timescaledb/core';
+import { TimescaleDB } from '@vigillabs/timescale-db-core';
 
 export const PageLoads = TimescaleDB.createHypertable('page_loads', {
   by_range: {

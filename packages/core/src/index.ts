@@ -4,7 +4,7 @@ import {
   CreateExtensionOptions,
   CreateHypertableOptions,
   RollupConfig,
-} from '@timescaledb/schemas';
+} from '@vigillabs/timescale-db-schemas';
 import { Hypertable } from './hypertable';
 import { Extension } from './extension';
 import { ContinuousAggregate } from './continuous-aggregate';
