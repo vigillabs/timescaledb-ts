@@ -40,9 +40,9 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@vigillabs/timescale-db-core": "^0.0.5",
-    "@vigillabs/timescale-db-utils": "^0.0.3",
-    "@vigillabs/timescale-db-schemas": "^0.0.3",
+    "@vigillabs/timescale-db-core": "^0.0.7",
+    "@vigillabs/timescale-db-utils": "^0.0.7",
+    "@vigillabs/timescale-db-schemas": "^0.0.7",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
   }
