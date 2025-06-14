@@ -1,5 +1,5 @@
 {
-  "name": "@timescaledb/example-node-typeorm",
+  "name": "@vigillabs/timescale-db-example-node-typeorm",
   "version": "0.0.9",
   "scripts": {
     "build": "tsc",

@@ -1,5 +1,5 @@
 {
-  "name": "@timescaledb/example-node-sequelize",
+  "name": "@vigillabs/timescale-db-example-node-sequelize",
   "version": "0.0.9",
   "scripts": {
     "build": "tsc",
