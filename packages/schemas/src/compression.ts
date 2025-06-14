@@ -27,6 +27,7 @@ export const SetCompressionOptionsSchema = z.object({
   compress: z.boolean(),
   compress_orderby: z.string(),
   compress_segmentby: z.string(),
+  chunk_time_interval: z.string().optional(),
   policy: SetCompressionPolicyOptionsSchema.optional(),
 });
 export type SetCompressionOptions = z.infer<typeof SetCompressionOptionsSchema>;
