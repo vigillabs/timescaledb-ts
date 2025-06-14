@@ -1,6 +1,6 @@
 {
   "name": "@vigillabs/timescale-db-example-node-typeorm",
-  "version": "0.0.13",
+  "version": "0.0.15",
   "scripts": {
     "build": "tsc",
     "start": "tsx src/index.ts",
