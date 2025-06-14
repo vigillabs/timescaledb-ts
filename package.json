@@ -1,6 +1,6 @@
 {
   "name": "@vigillabs/timescale-db",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "packageManager": "pnpm@9.15.3",
   "scripts": {
     "lint": "eslint .",
