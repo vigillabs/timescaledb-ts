@@ -47,7 +47,7 @@ class HypertableUpBuilder {
         this.statements.push(policy);
       }
 
-      const timeInterval = `SELECT set_chunk_time_interval(${escapeLiteral(this.name)}, INTERVAL ${chunkTimeInterval}, if_not_exists => true);`;
+      const timeInterval = `SELECT set_chunk_time_interval(${escapeLiteral(this.name)}, INTERVAL ${chunkTimeInterval});`;
       this.statements.push(timeInterval);
     }
 

@@ -170,11 +170,11 @@ importers:
   packages/core:
     dependencies:
       '@vigillabs/timescale-db-schemas':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:^0.0.17
+        version: link:../schemas
       '@vigillabs/timescale-db-utils':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:^0.0.17
+        version: link:../utils
 
   packages/schemas:
     dependencies:
@@ -185,14 +185,14 @@ importers:
   packages/typeorm:
     dependencies:
       '@vigillabs/timescale-db-core':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:^0.0.17
+        version: link:../core
       '@vigillabs/timescale-db-schemas':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:^0.0.17
+        version: link:../schemas
       '@vigillabs/timescale-db-utils':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:^0.0.17
+        version: link:../utils
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -203,8 +203,8 @@ importers:
   packages/utils:
     dependencies:
       '@vigillabs/timescale-db-schemas':
-        specifier: ^0.0.7
-        version: 0.0.7
+        specifier: workspace:^0.0.17
+        version: link:../schemas
       debug:
         specifier: ^4.4.0
         version: 4.4.0
@@ -1381,21 +1381,6 @@ packages:
 
   '@ungap/structured-clone@1.3.0':
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
-
-  '@vigillabs/timescale-db-core@0.0.7':
-    resolution: {integrity: sha512-4iKS9oj80vILz7OrKg95e1o/IOZkSvOVMooGWMFUtx/rlrztUQ6B2H9mMRDqJwuQiCeJlN58Mfynlv4h3WOzcg==}
-
-  '@vigillabs/timescale-db-schemas@0.0.3':
-    resolution: {integrity: sha512-JyrdhQYgXzwb7bmBSKFNMttjPSSasEXlbo4Bh8iVzOrRR+c4BzcypXWu4qJqZ7Ylle3Uyq/7LSfztsaeSRcLlQ==}
-
-  '@vigillabs/timescale-db-schemas@0.0.7':
-    resolution: {integrity: sha512-EwYB/3jIF/pRjPbN4D/fqpSopxyEY+xoBPF1JNNOnAmGeIzyHANGQzI7DEsdux5JEYWd3ZqkeLAcKpUz1wvm0A==}
-
-  '@vigillabs/timescale-db-utils@0.0.3':
-    resolution: {integrity: sha512-cEvSlNLFPzZTeL8HUwz10pAPjGPGGiW2PwZReBsaEu17Z9x6tt/RnkxCm6fktiKAj0+tg1pbL7Bik5ZVN3m1pQ==}
-
-  '@vigillabs/timescale-db-utils@0.0.7':
-    resolution: {integrity: sha512-mKfrxya8K3O8kEPh6aRS9O/Z0WrVkZO8t6P0vIdGUk5jsFAd5WG696vh1UtMhCsO+wpvyDeLzhC6qUVn6S4O7A==}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -5566,35 +5551,6 @@ snapshots:
       eslint-visitor-keys: 4.2.0
 
   '@ungap/structured-clone@1.3.0': {}
-
-  '@vigillabs/timescale-db-core@0.0.7':
-    dependencies:
-      '@vigillabs/timescale-db-schemas': 0.0.3
-      '@vigillabs/timescale-db-utils': 0.0.3
-    transitivePeerDependencies:
-      - supports-color
-
-  '@vigillabs/timescale-db-schemas@0.0.3':
-    dependencies:
-      zod: 3.24.2
-
-  '@vigillabs/timescale-db-schemas@0.0.7':
-    dependencies:
-      zod: 3.24.2
-
-  '@vigillabs/timescale-db-utils@0.0.3':
-    dependencies:
-      '@vigillabs/timescale-db-schemas': 0.0.3
-      debug: 4.4.0
-    transitivePeerDependencies:
-      - supports-color
-
-  '@vigillabs/timescale-db-utils@0.0.7':
-    dependencies:
-      '@vigillabs/timescale-db-schemas': 0.0.3
-      debug: 4.4.0
-    transitivePeerDependencies:
-      - supports-color
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:

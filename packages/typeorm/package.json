@@ -1,6 +1,6 @@
 {
   "name": "@vigillabs/timescale-db-typeorm",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -40,9 +40,9 @@
     "test": "jest --runInBand"
   },
   "dependencies": {
-    "@vigillabs/timescale-db-core": "^0.0.15",
-    "@vigillabs/timescale-db-utils": "^0.0.15",
-    "@vigillabs/timescale-db-schemas": "^0.0.15",
+    "@vigillabs/timescale-db-core": "workspace:^0.0.17",
+    "@vigillabs/timescale-db-utils": "workspace:^0.0.17",
+    "@vigillabs/timescale-db-schemas": "workspace:^0.0.17",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
   }
