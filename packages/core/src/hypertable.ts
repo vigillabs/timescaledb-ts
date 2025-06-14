@@ -34,7 +34,7 @@ class HypertableUpBuilder {
     if (this.options.compression?.compress) {
       const orderBy = escapeIdentifier(this.options.compression.compress_orderby);
       const segmentBy = escapeIdentifier(this.options.compression.compress_segmentby);
-      const chunkTimeInterval = escapeLiteral(this.options.compression.chunk_time_interval ?? '1 day');
+      const chunkTimeInterval = escapeLiteral(this.options.compression.chunk_time_interval ?? '1 days');
 
       const alter = `ALTER TABLE ${tableName} SET (
         timescaledb.compress,
@@ -45,7 +45,7 @@ class HypertableUpBuilder {
 
       if (this.options.compression.policy) {
         const interval = escapeLiteral(this.options.compression.policy.schedule_interval);
-        const policy = `SELECT add_compression_policy(${escapeLiteral(this.name)}, INTERVAL ${interval});`;
+        const policy = `SELECT add_compression_policy(${escapeLiteral(this.name)}, INTERVAL ${interval}, if_not_exists => true);`;
         this.statements.push(policy);
       }
 
