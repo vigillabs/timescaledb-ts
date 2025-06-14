@@ -1,6 +1,6 @@
 {
   "name": "@timescaledb/example-node-sequelize",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "scripts": {
     "build": "tsc",
     "start": "tsx src/index.ts",
