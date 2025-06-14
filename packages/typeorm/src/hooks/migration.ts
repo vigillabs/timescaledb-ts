@@ -110,18 +110,22 @@ async function setupHypertables(dataSource: DataSource) {
       }
 
       // Allow redundant hypertables for now
-      // if (hypertableCheck[0].is_hypertable) {
-      //   debug(`Hypertable for ${entity.tableName} already exists`);
-      //   continue;
-      // }
+      if (hypertableCheck[0].is_hypertable) {
+        debug(`Hypertable for ${entity.tableName} already exists, applying settings only`);
+
+        // Apply hypertable settings (compression, policies, etc.) without recreating the hypertable
+        // This allows users to update hypertable configuration in migrations without recreating the table
+        await dataSource.query(hypertable.up().build(true));
+
+        const repository = dataSource.getRepository(entity.target);
+        Object.assign(repository, timescaleMethods);
+        continue;
+      }
 
       debug(`Setting up hypertable for ${entity.tableName}`);
 
-      if (!hypertableCheck[0].is_hypertable) {
-        await dataSource.query(hypertable.up().build());
-      } else {
-        await dataSource.query(hypertable.up().build(true));
-      }
+      // Create new hypertable with all settings
+      await dataSource.query(hypertable.up().build(false));
 
       const repository = dataSource.getRepository(entity.target);
       Object.assign(repository, timescaleMethods);
