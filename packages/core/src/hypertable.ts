@@ -25,11 +25,9 @@ class HypertableUpBuilder {
     debug(`Building up query for hypertable '${this.name}'`);
     const tableName = escapeIdentifier(this.name);
 
-    if (!isHypertable) {
-      this.statements.push(
-        `SELECT create_hypertable(${escapeLiteral(this.name)}, by_range(${escapeLiteral(this.options.by_range.column_name)}));`,
-      );
-    }
+    this.statements.push(
+      `SELECT create_hypertable(${escapeLiteral(this.name)}, by_range(${escapeLiteral(this.options.by_range.column_name)}), if_not_exists := true);`,
+    );
 
     if (this.options.compression?.compress) {
       const orderBy = escapeIdentifier(this.options.compression.compress_orderby);
@@ -45,11 +43,11 @@ class HypertableUpBuilder {
 
       if (this.options.compression.policy) {
         const interval = escapeLiteral(this.options.compression.policy.schedule_interval);
-        const policy = `SELECT add_compression_policy(${escapeLiteral(this.name)}, INTERVAL ${interval}, if_not_exists => true);`;
+        const policy = `SELECT add_compression_policy(${escapeLiteral(this.name)}, INTERVAL ${interval}, if_not_exists := true);`;
         this.statements.push(policy);
       }
 
-      const timeInterval = `SELECT set_chunk_time_interval(${escapeLiteral(this.name)}, INTERVAL ${chunkTimeInterval});`;
+      const timeInterval = `SELECT set_chunk_time_interval(${escapeLiteral(this.name)}, INTERVAL ${chunkTimeInterval}, if_not_exists := true);`;
       this.statements.push(timeInterval);
     }
 
